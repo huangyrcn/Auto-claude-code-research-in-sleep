@@ -6,9 +6,9 @@
 
 ## 问题
 
-ARIS 实验在远程 screen/tmux session 中运行。当前的监控（`/monitor-experiment`）是**按需的** — 你必须主动问"实验怎么样了"。在两次检查之间：
+ARIS 实验在远程 `tmux` session 中运行。当前的监控（`/monitor-experiment`）是**按需的** — 你必须主动问"实验怎么样了"。在两次检查之间：
 
-- 训练 session 可能静默崩溃（screen 死了、OOM kill）
+- 训练 session 可能静默崩溃（`tmux` session 死了、OOM kill）
 - 下载可能卡住（网络超时、认证失败）
 - GPU 可能空闲（训练结束或崩溃但 session 还在）
 
@@ -51,9 +51,7 @@ scp tools/watchdog.py your-server:/path/to/project/tools/
 ### 2. 启动守护进程
 
 ```bash
-# 在服务器上的 screen/tmux 中启动（持久化运行）
-screen -dmS watchdog python3 tools/watchdog.py
-# 或
+# 在服务器上的 tmux 中启动（持久化运行）
 tmux new-session -d -s watchdog "python3 tools/watchdog.py"
 ```
 
@@ -67,12 +65,12 @@ python3 tools/watchdog.py --base-dir /tmp/my-monitor --interval 30
 启动实验后注册：
 
 ```bash
-# 训练任务（screen session，指定 GPU）
+# 训练任务（tmux session，指定 GPU）
 python3 tools/watchdog.py --register '{
   "name": "exp01",
   "type": "training",
-  "session": "exp01",
-  "session_type": "screen",
+  "session": "aris-exp01",
+  "session_type": "tmux",
   "gpus": [0, 1, 2, 3]
 }'
 
@@ -80,7 +78,7 @@ python3 tools/watchdog.py --register '{
 python3 tools/watchdog.py --register '{
   "name": "dl-imagenet",
   "type": "download",
-  "session": "dl01",
+  "session": "aris-dl01",
   "session_type": "tmux",
   "target_path": "/data/imagenet"
 }'
@@ -89,10 +87,10 @@ python3 tools/watchdog.py --register '{
 **必填字段：**
 - `name` — 唯一任务标识
 - `type` — `"training"` 或 `"download"`
-- `session` — screen/tmux session 名
+- `session` — tmux session 名
 
 **可选字段：**
-- `session_type` — `"screen"`（默认）或 `"tmux"`
+- `session_type` — `"tmux"`（默认且唯一）
 - `gpus` — 要监控的 GPU 编号列表（仅训练）
 - `target_path` — 追踪大小增长的文件/目录（仅下载）
 
@@ -146,9 +144,9 @@ python3 tools/watchdog.py --unregister exp01
 用 `/run-experiment` 部署实验后，注册到 watchdog：
 
 ```bash
-# /run-experiment 启动 screen session "exp01"
+# /run-experiment 启动 tmux session "aris-exp01"
 # 然后注册：
-python3 tools/watchdog.py --register '{"name":"exp01","type":"training","session":"exp01","gpus":[0,1]}'
+python3 tools/watchdog.py --register '{"name":"exp01","type":"training","session":"aris-exp01","gpus":[0,1]}'
 ```
 
 ### 配合 `/monitor-experiment`

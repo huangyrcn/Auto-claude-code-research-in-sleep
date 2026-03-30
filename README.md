@@ -185,7 +185,7 @@ See [full setup guide](#%EF%B8%8F-setup) for details and [alternative model comb
 - 📝 **Paper writing** — narrative → outline → figures → LaTeX → PDF → auto-review (4/10 → 8.5/10), one command. Anti-hallucination citations via [DBLP](https://dblp.org)/[CrossRef](https://www.crossref.org)
 - 🤖 **Cross-model collaboration** — Claude Code executes, GPT-5.4 xhigh reviews. Adversarial, not self-play
 - 📝 **Peer review** — review others' papers as a conference reviewer, with structured scoring and meta-review
-- 🖥️ **Review-driven experiments** — when GPT-5.4 says "run an ablation", Claude Code automatically writes the script, rsyncs to your GPU server, launches in screen, collects results, and folds them back into the paper. Just configure your server in `CLAUDE.md` ([setup guide](#%EF%B8%8F-gpu-server-setup-for-auto-experiments)). **No GPU?** Use `gpu: vast` to rent one from [Vast.ai](https://vast.ai) on demand
+- 🖥️ **Review-driven experiments** — when GPT-5.4 says "run an ablation", Claude Code automatically writes the script, rsyncs to your GPU server, launches in `tmux`, stores manifests under `exp/runs/`, collects results, and folds them back into the paper. Just configure your server in `CLAUDE.md` ([setup guide](#%EF%B8%8F-gpu-server-setup-for-auto-experiments)). **No GPU?** Use `gpu: vast` to rent one from [Vast.ai](https://vast.ai) on demand
 - 🔀 **Flexible models** — default Claude × GPT-5.4, also supports [GLM, MiniMax, Kimi, LongCat, DeepSeek, etc.](#-alternative-model-combinations) — no Claude or OpenAI API required
 - 🛑 **Human-in-the-loop** — configurable checkpoints at key decisions. `AUTO_PROCEED=true` for full autopilot, `false` to approve each step
 - 📱 **[Feishu/Lark notifications](#-feishulark-integration-optional)** — three modes: **off (default, strongly recommended for most users)**, push-only (webhook, mobile alerts), interactive (approve/reject from Feishu). Zero impact when unconfigured
@@ -848,8 +848,13 @@ Three GPU modes are supported — pick one and add it to your project's `CLAUDE.
 - GPU: 4x A100
 - Conda env: `research` (Python 3.10 + PyTorch)
 - Activate: `eval "$(/opt/conda/bin/conda shell.bash hook)" && conda activate research`
-- Code directory: `/home/user/experiments/`
-- Use `screen` for background jobs: `screen -dmS exp0 bash -c '...'`
+- remote_root: `/home/user/experiments/`
+- launcher: `tmux`
+- session_prefix: `aris`
+- runs_dir: `exp/runs`
+- logs_dir: `exp/logs`
+- results_dir: `exp/results`
+- Use `tmux` for background jobs: `tmux new-session -d -s aris-exp0 "bash -lc '...'"`
 ```
 
 Claude Code reads this and knows how to SSH in, activate the environment, and launch experiments. GPT-5.4 (the reviewer) only decides **what** experiments to run — Claude Code figures out **how** based on your `CLAUDE.md`.
@@ -864,7 +869,7 @@ If you are already on the GPU server, you can add the following to your `CLAUDE.
 - GPU: 4x A100 80GB
 - Experiment environment: `YOUR_CONDA_ENV` (Python 3.x + PyTorch)
 - Activate before any Python command: `The command to activate your experiment environment` (uv, conda, etc.)
-- Code directory: `/home/YOUR_USERNAME/YOUR_CODE_DIRECTORY/`
+- remote_root: `/home/YOUR_USERNAME/YOUR_CODE_DIRECTORY/`
 ```
 
 #### Option C: Vast.ai On-Demand GPU (`gpu: vast`)
@@ -1131,10 +1136,10 @@ python main.py
 # [Lark] connected to wss://msg-frontier.feishu.cn/ws/v2?...
 ```
 
-For long-running use, put it in a screen session:
+For long-running use, put it in a `tmux` session:
 
 ```bash
-screen -dmS feishu-bridge bash -c 'cd /path/to/feishu-claude-code && source .venv/bin/activate && python main.py'
+tmux new-session -d -s feishu-bridge "bash -lc 'cd /path/to/feishu-claude-code && source .venv/bin/activate && python main.py'"
 ```
 
 **Step 4: Save event config** — Go back to Feishu Open Platform → Events & Callbacks → the long connection should now show "已检测到连接" → **Save**

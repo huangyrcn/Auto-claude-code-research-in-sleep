@@ -1,7 +1,7 @@
 ---
 name: monitor-experiment
 description: Monitor running experiments, check progress, collect results. Use when user says "check results", "is it done", "monitor", or wants experiment output.
-argument-hint: [server-alias or screen-name]
+argument-hint: [run-id or server-alias]
 allowed-tools: Bash(ssh *), Bash(echo *), Read, Write, Edit
 ---
 
@@ -13,14 +13,20 @@ Monitor: $ARGUMENTS
 
 ### Step 1: Check What's Running
 
+Prefer `run_id`-based monitoring over raw session-name monitoring.
+
+1. Read `exp/runs/*/run.json` and identify the most relevant run(s)
+2. Resolve `session_name`, `host`, `log_path`, and `result_path`
+3. If the user passed only a host/server alias, list the most recent run manifests first
+
 **SSH server:**
 ```bash
-ssh <server> "screen -ls"
+ssh <server> "tmux ls"
 ```
 
 **Vast.ai instance** (read `ssh_host`, `ssh_port` from `vast-instances.json`):
 ```bash
-ssh -p <PORT> root@<HOST> "screen -ls"
+ssh -p <PORT> root@<HOST> "tmux ls"
 ```
 
 Also check vast.ai instance status:
@@ -28,23 +34,47 @@ Also check vast.ai instance status:
 vastai show instances
 ```
 
-### Step 2: Collect Output from Each Screen
-For each screen session, capture the last N lines:
+### Step 2: Collect Output From Each Run
+
+For each active run, capture recent output from the `tmux` pane first, then fall back to the log file:
+
+**SSH server:**
 ```bash
-ssh <server> "screen -S <name> -X hardcopy /tmp/screen_<name>.txt && tail -50 /tmp/screen_<name>.txt"
+ssh <server> "tmux capture-pane -t <session_name> -p | tail -50"
 ```
 
-If hardcopy fails, check for log files or tee output.
+**Vast.ai instance:**
+```bash
+ssh -p <PORT> root@<HOST> "tmux capture-pane -t <session_name> -p | tail -50"
+```
+
+If pane capture fails, inspect the persisted log:
+
+```bash
+tail -50 exp/logs/<run_id>.log
+ssh <server> "tail -50 <remote_workdir>/exp/logs/<run_id>.log"
+```
 
 ### Step 3: Check for JSON Result Files
 ```bash
-ssh <server> "ls -lt <results_dir>/*.json 2>/dev/null | head -20"
+ls -lt exp/results/*.json 2>/dev/null | head -20
+ssh <server> "ls -lt <remote_workdir>/exp/results/*.json 2>/dev/null | head -20"
 ```
 
 If JSON results exist, fetch and parse them:
 ```bash
-ssh <server> "cat <results_dir>/<latest>.json"
+cat exp/results/<run_id>.json
+ssh <server> "cat <remote_workdir>/exp/results/<run_id>.json"
 ```
+
+Also inspect `exp/runs/<run_id>/run.json` to determine:
+
+- launcher (`tmux`)
+- session name
+- status
+- launch command
+- host / remote workdir
+- log path / result path
 
 ### Step 3.5: Pull W&B Metrics (when `wandb: true` in CLAUDE.md)
 
@@ -92,7 +122,7 @@ print(json.dumps(dict(run.summary), indent=2, default=str))
 https://wandb.ai/<entity>/<project>/runs/<run_id>
 ```
 
-> This gives the auto-review-loop richer signal than just screen output — training dynamics, loss curves, and metric trends over time.
+> This gives the auto-review-loop richer signal than just pane output — training dynamics, loss curves, and metric trends over time.
 
 ### Step 4: Summarize Results
 
@@ -118,6 +148,7 @@ After results are collected, check `~/.claude/feishu.json`:
 ## Key Rules
 - Always show raw numbers before interpretation
 - Compare against the correct baseline (same config)
-- Note if experiments are still running (check progress bars, iteration counts)
+- Prefer `run_id` + `run.json` over guessing session names
+- Note if experiments are still running (check `tmux` session, progress bars, iteration counts)
 - If results look wrong, check training logs for errors before concluding
 - **Vast.ai cost awareness**: When monitoring vast.ai instances, report the running cost (hours * $/hr from `vast-instances.json`). If all experiments on an instance are done, remind the user to run `/vast-gpu destroy <instance_id>` to stop billing

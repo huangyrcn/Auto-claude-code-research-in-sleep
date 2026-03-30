@@ -94,7 +94,8 @@ Deploy the full-scale experiments:
 **What this does:**
 - Check GPU availability on configured servers
 - Sync code to remote server
-- Launch experiments in screen sessions with proper CUDA_VISIBLE_DEVICES
+- Launch experiments in `tmux` sessions with proper CUDA_VISIBLE_DEVICES
+- Persist run manifests under `exp/runs/` plus logs/results under `exp/logs/` and `exp/results/`
 - Verify experiments started successfully
 
 **Monitor progress:**
@@ -170,4 +171,3 @@ After the auto-review loop completes, write a final status report:
 | 4. Auto Review | 1-4 hours (depends on experiments) | Yes ✅ |
 
 **Sweet spot**: Run Stage 1-2 in the evening, launch Stage 3-4 before bed, wake up to a reviewed paper.
-

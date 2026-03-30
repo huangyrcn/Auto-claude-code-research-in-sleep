@@ -145,8 +145,8 @@ Antigravity uses `GEMINI.md` (equivalent to Claude Code's `CLAUDE.md`) for proje
 - GPU: 4x A100
 - Conda env: `research` (Python 3.10 + PyTorch)
 - Activate: `eval "$(/opt/conda/bin/conda shell.bash hook)" && conda activate research`
-- Code directory: `/home/user/experiments/`
-- Use `screen` for background jobs: `screen -dmS exp0 bash -c '...'`
+- remote_root: `/home/user/experiments/`
+- Use `tmux` for background jobs: `tmux new-session -d -s aris-exp0 "bash -lc '...'"`
 
 ## Research Project
 
@@ -322,8 +322,8 @@ Add your server info to `GEMINI.md` in your project root (equivalent to `CLAUDE.
 - GPU: 4x A100
 - Conda env: `research` (Python 3.10 + PyTorch)
 - Activate: `eval "$(/opt/conda/bin/conda shell.bash hook)" && conda activate research`
-- Code directory: `/home/user/experiments/`
-- Use `screen` for background jobs
+- remote_root: `/home/user/experiments/`
+- Use `tmux` for background jobs
 ```
 
 Then invoke:

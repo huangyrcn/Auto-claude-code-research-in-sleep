@@ -33,7 +33,15 @@ Long-running loops may hit the context window limit, triggering automatic compac
   "status": "in_progress",
   "last_score": 5.0,
   "last_verdict": "not ready",
-  "pending_experiments": ["screen_name_1"],
+  "pending_experiments": [
+    {
+      "run_id": "r20260330-153000-main",
+      "session_name": "aris-r20260330-153000-main",
+      "launcher": "tmux",
+      "log_path": "exp/logs/r20260330-153000-main.log",
+      "result_path": "exp/results/r20260330-153000-main.json"
+    }
+  ],
   "timestamp": "2026-03-13T21:00:00"
 }
 ```
@@ -53,7 +61,7 @@ Long-running loops may hit the context window limit, triggering automatic compac
    - If it exists AND `status` is `"in_progress"` AND `timestamp` is within 24 hours: **resume**
      - Read the state file to recover `round`, `threadId`, `last_score`, `pending_experiments`
      - Read `research/AUTO_REVIEW.md` to restore full context of prior rounds
-     - If `pending_experiments` is non-empty, check if they have completed (e.g., check screen sessions)
+     - If `pending_experiments` is non-empty, check whether their `tmux` sessions are still alive and whether `exp/results/*.json` has appeared
      - Resume from the next round (round = saved round + 1)
      - Log: "Recovered from context compaction. Resuming at Round N."
 2. Read project narrative documents, memory files, and any prior review documents. **When `COMPACT = true` and compact files exist**: read `research/findings.md` + `research/EXPERIMENT_LOG.md` instead of full `research/AUTO_REVIEW.md` and raw logs — saves context window.
@@ -145,7 +153,7 @@ After parsing the score, check if `~/.claude/feishu.json` exists and mode is not
 For each action item (highest priority first):
 
 1. **Code changes**: Write/modify experiment scripts, model code, analysis scripts
-2. **Run experiments**: Deploy to GPU server via SSH + screen/tmux
+2. **Run experiments**: Deploy to GPU server via SSH + tmux, and record the returned `run_id` handles
 3. **Analysis**: Run evaluation, collect results, update figures/tables
 4. **Documentation**: Update project notes and review document
 
@@ -158,8 +166,8 @@ Prioritization rules:
 #### Phase D: Wait for Results
 
 If experiments were launched:
-- Monitor remote sessions for completion
-- Collect results from output files and logs
+- Monitor `tmux` sessions for completion
+- Collect results from `exp/results/*.json` and `exp/logs/*.log`
 - **Training quality check** — if W&B is configured, invoke `/training-check` to verify training was healthy (no NaN, no divergence, no plateau). If W&B not available, skip silently. Flag any quality issues in the next review round.
 
 #### Phase E: Document Round

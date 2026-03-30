@@ -33,7 +33,7 @@ Generate all figures and tables for a paper based on: **$ARGUMENTS**
 ## Inputs
 
 1. **PAPER_PLAN.md** — figure plan table (from `/paper-plan`)
-2. **Experiment data** — JSON files, CSV files, or screen logs in `writing/paper/figures/` or project root
+2. **Experiment data** — JSON files, CSV files, `exp/results/*.json`, or `exp/logs/*.log`
 3. **Existing figures** — any manually created figures to preserve
 
 If no PAPER_PLAN.md exists, scan for data files and ask the user which figures to generate.
@@ -276,4 +276,3 @@ figures/
 ## Acknowledgements
 
 Design pattern (type × style matrix) inspired by [baoyu-skills](https://github.com/jimliu/baoyu-skills). Publication style defaults and figure rules from [pedrohcgs/claude-code-my-workflow](https://github.com/pedrohcgs/claude-code-my-workflow). Visualization decision tree from [Imbad0202/academic-research-skills](https://github.com/Imbad0202/academic-research-skills).
-

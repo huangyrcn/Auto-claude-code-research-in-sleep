@@ -98,7 +98,8 @@ Deploy the full-scale experiments:
 **What this does:**
 - Check GPU availability on configured servers
 - Sync code to remote server
-- Launch experiments in screen sessions with proper CUDA_VISIBLE_DEVICES
+- Launch experiments in `tmux` sessions with proper CUDA_VISIBLE_DEVICES
+- Persist run manifests under `exp/runs/` plus logs/results under `exp/logs/` and `exp/results/`
 - Verify experiments started successfully
 
 **Monitor progress:**

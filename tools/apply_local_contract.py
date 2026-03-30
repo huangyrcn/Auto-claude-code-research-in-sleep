@@ -174,7 +174,7 @@ def apply_paper_pipeline(text: str) -> str:
         ("placed in `figures/`", "placed in `writing/paper/figures/`"),
         ("files in `figures/`", "files in `writing/paper/figures/`"),
         ("JSON files in `figures/`", "JSON files in `writing/paper/figures/`"),
-        ("CSV files, or screen logs in `figures/` or project root", "CSV files, or screen logs in `writing/paper/figures/` or project root"),
+        ("CSV files, or experiment logs in `figures/` or project root", "CSV files, or `exp/results/*.json` and `exp/logs/*.log`"),
         ("writing/paper/", "writing/paper/"),
     ]
     for old, new in exact_pairs:

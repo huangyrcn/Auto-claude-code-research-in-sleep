@@ -36,7 +36,7 @@ research/refine/FINAL_PROPOSAL.md
 This skill expects one or more of:
 
 1. **`research/refine/EXPERIMENT_PLAN.md`** (best) — claim-driven experiment roadmap from `/experiment-plan`
-2. **`research/refine/EXPERIMENT_TRACKER.md`** — run-by-run execution table
+2. **`research/refine/EXPERIMENT_TRACKER.md`** — run-by-run execution table, including `run_id`, status, and notes
 3. **`research/refine/FINAL_PROPOSAL.md`** — method description for implementation context
 4. **`research/IDEA_CANDIDATES.md`** — compact idea summary (preferred when `COMPACT: true`)
 5. **`research/IDEA_REPORT.md`** — full brainstorm output (fallback)
@@ -166,7 +166,8 @@ Deploy experiments following the plan's milestone order:
 For each milestone:
 1. Deploy experiments in parallel (up to MAX_PARALLEL_RUNS)
 2. Use `/monitor-experiment` to track progress
-3. Collect results as experiments complete
+3. Capture the returned `run_id`, `session_name`, `log_path`, and `result_path`
+4. Collect results as experiments complete
 
 **🚦 Checkpoint (if AUTO_DEPLOY = false):**
 
@@ -187,9 +188,9 @@ Deploy now? Or review the code first?
 
 As experiments complete:
 
-1. **Parse output files** (JSON/CSV/logs) for key metrics
+1. **Parse output files** from `exp/results/*.json` and `exp/logs/*.log` for key metrics
 2. **Training quality check** — if W&B data is available (CLAUDE.md has `wandb: true` and `wandb_project`), invoke `/training-check` to detect NaN, loss divergence, plateaus, or overfitting. If W&B is not configured, skip silently.
-3. **Update `research/refine/EXPERIMENT_TRACKER.md`** — fill in Status and Notes columns
+3. **Update `research/refine/EXPERIMENT_TRACKER.md`** — fill in `run_id`, Status, Notes, and where the logs/results landed
 4. **Check success criteria** from EXPERIMENT_PLAN.md — did each experiment meet its bar?
 4. **Write initial results summary:**
 
@@ -241,7 +242,7 @@ Append each completed experiment to `research/EXPERIMENT_LOG.md`:
 - **Reproduce**: `python train.py --config configs/run_id.yaml --seed 42`
 ```
 
-This structured log survives session recovery — downstream skills read it instead of parsing screen output.
+This structured log survives session recovery — downstream skills should prefer the `run_id`, `exp/results/*.json`, and `exp/logs/*.log` instead of guessing from live tmux panes.
 
 ### Phase 5.6: Auto Ablation Planning
 
@@ -267,6 +268,7 @@ Present final status:
 
 Results: research/refine/EXPERIMENT_RESULTS.md
 Tracker: research/refine/EXPERIMENT_TRACKER.md
+Runtime artifacts: exp/runs/<run_id>/run.json, exp/logs/<run_id>.log, exp/results/<run_id>.json
 
 Ready for Workflow 2:
 → /auto-review-loop "[topic]"
@@ -280,7 +282,7 @@ Ready for Workflow 2:
 - **Sanity first.** Never deploy a full suite without verifying the sanity stage passes.
 - **Reuse existing code.** Scan the project before writing new scripts. Extend, don't duplicate.
 - **Save everything as JSON/CSV.** The auto-review-loop needs parseable results, not just terminal output.
-- **Update the tracker.** `EXPERIMENT_TRACKER.md` should reflect real status after each run completes.
+- **Update the tracker.** `EXPERIMENT_TRACKER.md` should reflect the real `run_id`, launch status, and result location after each run completes.
 - **Don't wait forever.** If an experiment exceeds 2x its estimated time, flag it and move on to the next milestone.
 - **Budget awareness.** Track GPU-hours against the plan's budget. Warn if approaching the limit.
 - **Vast.ai lifecycle.** If using vast.ai instances, destroy them after all experiments complete and results are downloaded. Running instances cost money every second — don't leave them idle. Use `/vast-gpu destroy` or `/vast-gpu destroy-all` when done.

@@ -161,7 +161,7 @@ vastai create instance <OFFER_ID> \
   --disk <DISK_GB> \
   --ssh \
   --direct \
-  --onstart-cmd "apt-get update && apt-get install -y git screen rsync"
+  --onstart-cmd "apt-get update && apt-get install -y git tmux rsync"
 ```
 
 Default Docker image: `pytorch/pytorch:2.1.0-cuda12.1-cudnn8-devel` (override via `CLAUDE.md` `image:` field if set).

@@ -187,7 +187,7 @@ claude
 - 📝 **论文写作** — 研究叙事 → 大纲 → 图表 → LaTeX → PDF → 自动审稿（4/10 → 8.5/10），一条命令。通过 [DBLP](https://dblp.org)/[CrossRef](https://www.crossref.org) 反幻觉引用
 - 🤖 **跨模型协作** — Claude Code 执行，GPT-5.4 xhigh 审稿。对抗式而非自我博弈
 - 📝 **Peer Review** — 以审稿人视角审阅他人论文，结构化打分 + meta-review
-- 🖥️ **审稿驱动实验** — GPT-5.4 说"跑个消融实验"，Claude Code 自动写脚本、rsync 到服务器、screen 启动、收结果、写回论文。只需在 `CLAUDE.md` 里配好服务器信息（[配置指南](#%EF%B8%8F-gpu-服务器配置自动实验用)）
+- 🖥️ **审稿驱动实验** — GPT-5.4 说"跑个消融实验"，Claude Code 自动写脚本、rsync 到服务器、用 `tmux` 启动，在 `exp/runs/` 记录运行句柄、收结果、写回论文。只需在 `CLAUDE.md` 里配好服务器信息（[配置指南](#%EF%B8%8F-gpu-服务器配置自动实验用)）
 - 🔀 **灵活模型** — 默认 Claude × GPT-5.4，也支持 [GLM、MiniMax、Kimi、LongCat、DeepSeek 等](#-替代模型组合)——无需 Claude 或 OpenAI API
 - 🛑 **Human-in-the-loop** — 关键决策点可配置检查点。`AUTO_PROCEED=true` 全自动，`false` 逐步审批
 - 📱 **[飞书通知](#-飞书lark-集成可选)** — 三种模式：**关闭（默认，强烈建议大多数用户保持关闭）**、仅推送（webhook，手机收通知）、双向交互（在飞书里审批/回复）。未配置时零影响
@@ -675,8 +675,13 @@ cp -r skills/experiment-bridge ~/.claude/skills/
 - GPU：4x A100
 - Conda 环境：`research`（Python 3.10 + PyTorch）
 - 激活：`eval "$(/opt/conda/bin/conda shell.bash hook)" && conda activate research`
-- 代码目录：`/home/user/experiments/`
-- 后台运行用 `screen`：`screen -dmS exp0 bash -c '...'`
+- remote_root：`/home/user/experiments/`
+- launcher：`tmux`
+- session_prefix：`aris`
+- runs_dir：`exp/runs`
+- logs_dir：`exp/logs`
+- results_dir：`exp/results`
+- 后台运行用 `tmux`：`tmux new-session -d -s aris-exp0 "bash -lc '...'"`
 ```
 
 Claude Code 读到这些就知道怎么 SSH、激活环境、启动实验。GPT-5.4（审稿人）只决定**做什么实验**——Claude Code 根据你的 `CLAUDE.md` 搞定**怎么跑**。
@@ -907,10 +912,10 @@ python main.py
 # [Lark] connected to wss://msg-frontier.feishu.cn/ws/v2?...
 ```
 
-长期运行丢 screen 里：
+长期运行放进 `tmux`：
 
 ```bash
-screen -dmS feishu-bridge bash -c 'cd /path/to/feishu-claude-code && source .venv/bin/activate && python main.py'
+tmux new-session -d -s feishu-bridge "bash -lc 'cd /path/to/feishu-claude-code && source .venv/bin/activate && python main.py'"
 ```
 
 **第 4 步：保存事件配置** — 回到飞书开放平台 → 事件与回调 → 长连接应该显示"已检测到连接"→ **保存**

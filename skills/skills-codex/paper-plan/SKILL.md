@@ -19,7 +19,7 @@ The skill expects one or more of these in the project directory:
 
 1. **NARRATIVE_REPORT.md** or **STORY.md** — research narrative with claims and evidence
 2. **GPT54_research/AUTO_REVIEW.md** — auto-review loop conclusions
-3. **Experiment results** — JSON files in `writing/paper/figures/`, screen logs, tables
+3. **Experiment results** — JSON files in `exp/results/`, logs in `exp/logs/`, tables, and paper-ready figures
 4. **research/IDEA_REPORT.md** — from idea-discovery pipeline (if applicable)
 5. **CLAIMS_FROM_RESULTS.md** — structured claim judgment from `/result-to-claim` (preferred if available)
 

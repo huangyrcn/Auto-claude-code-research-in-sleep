@@ -88,7 +88,7 @@
   <text x="233" y="138" font-size="8px" fill="#4aaa4a">$</text>
   <text x="241" y="138" font-size="8px" fill="#ccc"> conda activate env</text>
   <text x="233" y="150" font-size="8px" fill="#4aaa4a">$</text>
-  <text x="241" y="150" font-size="8px" fill="#ccc"> screen -dmS exp0</text>
+  <text x="241" y="150" font-size="8px" fill="#ccc"> tmux new -ds exp0</text>
   <text x="233" y="162" font-size="8px" fill="#4aaa4a">$</text>
   <text x="241" y="162" font-size="8px" fill="#ccc"> python train.py</text>
   <text x="233" y="178" font-size="8px" fill="#e5c07b">GPU 0-3:</text>

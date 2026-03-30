@@ -35,7 +35,7 @@ Generate all figures and tables for a paper based on: **$ARGUMENTS**
 ## Inputs
 
 1. **PAPER_PLAN.md** — figure plan table (from `/paper-plan`)
-2. **Experiment data** — JSON files, CSV files, or screen logs in `writing/paper/figures/` or project root
+2. **Experiment data** — JSON files, CSV files, `exp/results/*.json`, or `exp/logs/*.log`
 3. **Existing figures** — any manually created figures to preserve
 
 If no PAPER_PLAN.md exists, scan for data files and ask the user which figures to generate.

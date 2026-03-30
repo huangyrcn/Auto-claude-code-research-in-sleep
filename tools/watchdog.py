@@ -6,14 +6,14 @@ One process per server, monitors all registered tasks (training / download).
 Outputs per-task status JSON + aggregated summary.txt for low-frequency polling.
 
 Usage:
-    # Start the daemon (runs in foreground, use tmux/screen to persist)
+    # Start the daemon (runs in foreground, use tmux to persist)
     python3 watchdog.py [--base-dir /tmp/aris-watchdog] [--interval 60]
 
     # Register a training task
-    python3 watchdog.py --register '{"name":"exp01","type":"training","session":"exp01","session_type":"screen","gpus":[0,1,2,3]}'
+    python3 watchdog.py --register '{"name":"exp01","type":"training","session":"aris-exp01","session_type":"tmux","gpus":[0,1,2,3]}'
 
     # Register a download task
-    python3 watchdog.py --register '{"name":"dl01","type":"download","session":"dl01","session_type":"tmux","target_path":"/path/to/file"}'
+    python3 watchdog.py --register '{"name":"dl01","type":"download","session":"aris-dl01","session_type":"tmux","target_path":"/path/to/file"}'
 
     # Unregister a task
     python3 watchdog.py --unregister exp01
@@ -76,9 +76,12 @@ def register_task(base_dir, task_json):
         print(f"error: type must be 'training' or 'download', got '{task['type']}'", file=sys.stderr)
         sys.exit(1)
 
-    # Default session_type: auto-detect or fallback to screen
+    # Default session_type: tmux only
     if "session_type" not in task:
-        task["session_type"] = "screen"
+        task["session_type"] = "tmux"
+    if task["session_type"] != "tmux":
+        print("error: session_type must be 'tmux' in this fork", file=sys.stderr)
+        sys.exit(1)
 
     tasks = []
     if paths["tasks"].exists():
@@ -113,22 +116,18 @@ def unregister_task(base_dir, name):
     print(f"unregistered: {name}")
 
 
-# ── Session checks (tmux + screen) ──────────────────────────────
+# ── Session checks (tmux) ───────────────────────────────────────
 
 
-def session_alive(session_name, session_type="screen"):
-    """Check if a tmux or screen session is alive."""
-    if session_type == "tmux":
-        r = subprocess.run(
-            ["tmux", "has-session", "-t", session_name],
-            capture_output=True,
-        )
-        return r.returncode == 0
-    else:  # screen
-        r = subprocess.run(
-            ["screen", "-list"], capture_output=True, text=True,
-        )
-        return session_name in r.stdout
+def session_alive(session_name, session_type="tmux"):
+    """Check if a tmux session is alive."""
+    if session_type != "tmux":
+        return False
+    r = subprocess.run(
+        ["tmux", "has-session", "-t", session_name],
+        capture_output=True,
+    )
+    return r.returncode == 0
 
 
 # ── GPU checks ───────────────────────────────────────────────────
@@ -166,7 +165,7 @@ def get_path_size(path):
 def check_download(task, status_dir, interval):
     name = task["name"]
     session = task["session"]
-    session_type = task.get("session_type", "screen")
+    session_type = task.get("session_type", "tmux")
     target = task.get("target_path", "")
     status_file = status_dir / f"{name}.json"
     now = time.strftime("%Y-%m-%dT%H:%M:%S")
@@ -219,7 +218,7 @@ def check_download(task, status_dir, interval):
 def check_training(task, status_dir):
     name = task["name"]
     session = task["session"]
-    session_type = task.get("session_type", "screen")
+    session_type = task.get("session_type", "tmux")
     status_file = status_dir / f"{name}.json"
     now = time.strftime("%Y-%m-%dT%H:%M:%S")
 
@@ -353,11 +352,11 @@ Examples:
   # Start daemon
   python3 watchdog.py
 
-  # Register a training task (screen session)
-  python3 watchdog.py --register '{"name":"exp01","type":"training","session":"exp01","gpus":[0,1]}'
+  # Register a training task (tmux session)
+  python3 watchdog.py --register '{"name":"exp01","type":"training","session":"aris-exp01","gpus":[0,1]}'
 
   # Register a download task (tmux session)
-  python3 watchdog.py --register '{"name":"dl01","type":"download","session":"dl01","session_type":"tmux","target_path":"/data/imagenet"}'
+  python3 watchdog.py --register '{"name":"dl01","type":"download","session":"aris-dl01","session_type":"tmux","target_path":"/data/imagenet"}'
 
   # Check summary
   python3 watchdog.py --status

@@ -9,12 +9,17 @@ Deploy and run ML experiment: $ARGUMENTS
 
 ## Workflow
 
-### Step 1: Detect Environment
+### Step 1: Detect Environment And Runtime Contract
 
-Read the project's `AGENTS.md` to determine the experiment environment:
+Read the project's `AGENTS.md` to determine the experiment environment and runtime contract:
 
 - **Local GPU**: Look for local CUDA/MPS setup info
-- **Remote server**: Look for SSH alias, conda env, code directory
+- **Remote server**: Look for SSH alias, conda env, and remote root
+- **Launcher** (`launcher: tmux`): Treat `tmux` as the canonical launcher
+- **Session prefix** (`session_prefix: aris`): Default session name prefix
+- **Runs directory** (`runs_dir: exp/runs`): Default run manifest directory
+- **Logs directory** (`logs_dir: exp/logs`): Default log directory
+- **Results directory** (`results_dir: exp/results`): Default structured result directory
 
 If no server info is found in `AGENTS.md`, ask the user.
 
@@ -44,7 +49,7 @@ Check the project's `AGENTS.md` for a `code_sync` setting. If not specified, def
 
 Only sync necessary files — NOT data, checkpoints, or large files:
 ```bash
-rsync -avz --include='*.py' --exclude='*' <local_src>/ <server>:<remote_dst>/
+rsync -avz --include='*.py' --exclude='*' <local_src>/ <server>:<remote_workdir>/
 ```
 
 #### Option B: git (when `code_sync: git` is set in AGENTS.md)
@@ -55,7 +60,7 @@ Push local changes to remote repo, then pull on the server:
 git add -A && git commit -m "sync: experiment deployment" && git push
 
 # 2. Pull on server
-ssh <server> "cd <remote_dst> && git pull"
+ssh <server> "cd <remote_workdir> && git pull"
 ```
 
 Benefits: version-tracked, multi-server sync with one push, no rsync include/exclude rules needed.
@@ -100,26 +105,41 @@ Before deploying, ensure the experiment scripts have W&B logging:
 
 > The W&B project name and API key come from `AGENTS.md` (see example below). The experiment name is auto-generated from the script name + timestamp.
 
+### Step 3.2: Reserve Run Handles
+
+Before deployment, create:
+
+- `exp/runs/<run_id>/launch.sh`
+- `exp/runs/<run_id>/run.json`
+- `exp/logs/<run_id>.log`
+- `exp/results/<run_id>.json`
+
+Set `session_name = aris-<run_id>` unless `session_prefix` overrides it.
+
 ### Step 4: Deploy
 
-#### Remote (via SSH + screen)
+#### Remote (via SSH + tmux)
 
-For each experiment, create a dedicated screen session with GPU binding:
+For each experiment, create a dedicated `tmux` session with GPU binding:
 ```bash
-ssh <server> "screen -dmS <exp_name> bash -c '\
-  eval \"\$(<conda_path>/conda shell.bash hook)\" && \
-  conda activate <env> && \
-  CUDA_VISIBLE_DEVICES=<gpu_id> python <script> <args> 2>&1 | tee <log_file>'"
+ssh <server> "mkdir -p <remote_workdir>/exp/runs/<run_id> <remote_workdir>/exp/logs <remote_workdir>/exp/results && \
+  tmux new-session -d -s <session_name> '\
+  cd <remote_workdir> && \
+  bash exp/runs/<run_id>/launch.sh'"
 ```
 
 #### Local
 
 ```bash
 # Linux with CUDA
-CUDA_VISIBLE_DEVICES=<gpu_id> python <script> <args> 2>&1 | tee <log_file>
+tmux new-session -d -s <session_name> '\
+  cd <project_root> && \
+  bash exp/runs/<run_id>/launch.sh'
 
 # Mac with MPS (PyTorch uses MPS automatically)
-python <script> <args> 2>&1 | tee <log_file>
+tmux new-session -d -s <session_name> '\
+  cd <project_root> && \
+  bash exp/runs/<run_id>/launch.sh'
 ```
 
 For local long-running jobs, use `run_in_background: true` to keep the conversation responsive.
@@ -128,7 +148,7 @@ For local long-running jobs, use `run_in_background: true` to keep the conversat
 
 **Remote:**
 ```bash
-ssh <server> "screen -ls"
+ssh <server> "tmux ls"
 ```
 
 **Local:**
@@ -143,10 +163,11 @@ After deployment is verified, check `~/.codex/feishu.json`:
 ## Key Rules
 
 - ALWAYS check GPU availability first — never blindly assign GPUs
-- Each experiment gets its own screen session + GPU (remote) or background process (local)
-- Use `tee` to save logs for later inspection
+- Each experiment gets its own `tmux` session + GPU binding
+- Every launch should reserve a `run_id`, `run.json`, log path, and result path
+- Use `tee` to save logs to `exp/logs/<run_id>.log`
 - Run deployment commands with `run_in_background: true` to keep conversation responsive
-- Report back: which GPU, which screen/process, what command, estimated time
+- Report back: which GPU, which `tmux` session, which `run_id`, what command, estimated time
 - If multiple experiments, launch them in parallel on different GPUs
 
 ## AGENTS.md Example
@@ -155,16 +176,22 @@ Users should add their server info to their project's `AGENTS.md`:
 
 ```markdown
 ## Remote Server
+- launcher: tmux
 - SSH: `ssh my-gpu-server`
 - GPU: 4x A100 (80GB each)
 - Conda: `eval "$(/opt/conda/bin/conda shell.bash hook)" && conda activate research`
-- Code dir: `/home/user/experiments/`
+- remote_root: `/home/user/experiments`
 - code_sync: rsync          # default. Or set to "git" for git push/pull workflow
+- session_prefix: aris
+- runs_dir: exp/runs
+- logs_dir: exp/logs
+- results_dir: exp/results
 - wandb: false              # set to "true" to auto-add W&B logging to experiment scripts
 - wandb_project: my-project # W&B project name (required if wandb: true)
 - wandb_entity: my-team     # W&B team/user (optional, uses default if omitted)
 
 ## Local Environment
+- launcher: tmux
 - Mac MPS / Linux CUDA
 - Conda env: `ml` (Python 3.10 + PyTorch)
 ```

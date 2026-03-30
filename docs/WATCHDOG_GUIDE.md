@@ -6,9 +6,9 @@
 
 ## The Problem
 
-ARIS experiments run remotely in screen/tmux sessions. Current monitoring (`/monitor-experiment`) is **on-demand** — you have to actively ask "how are my experiments doing?". Between checks:
+ARIS experiments run remotely in `tmux` sessions. Current monitoring (`/monitor-experiment`) is **on-demand** — you have to actively ask "how are my experiments doing?". Between checks:
 
-- A training session can crash silently (screen dies, OOM kill)
+- A training session can crash silently (`tmux` session dies, OOM kill)
 - A download can stall (network timeout, auth failure)
 - GPUs can go idle (training finished or crashed but session stays open)
 
@@ -52,9 +52,7 @@ Or if using rsync for code sync (as in `/run-experiment`), just include `tools/`
 ### 2. Start the daemon
 
 ```bash
-# In a screen/tmux session on the server (so it persists)
-screen -dmS watchdog python3 tools/watchdog.py
-# or
+# In a tmux session on the server (so it persists)
 tmux new-session -d -s watchdog "python3 tools/watchdog.py"
 ```
 
@@ -68,12 +66,12 @@ python3 tools/watchdog.py --base-dir /tmp/my-monitor --interval 30
 After launching an experiment:
 
 ```bash
-# Training task (screen session, specific GPUs)
+# Training task (tmux session, specific GPUs)
 python3 tools/watchdog.py --register '{
   "name": "exp01",
   "type": "training",
-  "session": "exp01",
-  "session_type": "screen",
+  "session": "aris-exp01",
+  "session_type": "tmux",
   "gpus": [0, 1, 2, 3]
 }'
 
@@ -81,7 +79,7 @@ python3 tools/watchdog.py --register '{
 python3 tools/watchdog.py --register '{
   "name": "dl-imagenet",
   "type": "download",
-  "session": "dl01",
+  "session": "aris-dl01",
   "session_type": "tmux",
   "target_path": "/data/imagenet"
 }'
@@ -90,10 +88,10 @@ python3 tools/watchdog.py --register '{
 **Required fields:**
 - `name` — unique task identifier
 - `type` — `"training"` or `"download"`
-- `session` — screen/tmux session name
+- `session` — tmux session name
 
 **Optional fields:**
-- `session_type` — `"screen"` (default) or `"tmux"`
+- `session_type` — `"tmux"` (default and canonical)
 - `gpus` — list of GPU indices to monitor (training only)
 - `target_path` — file/directory to track size growth (download only)
 
@@ -147,9 +145,9 @@ python3 tools/watchdog.py --unregister exp01
 After deploying an experiment with `/run-experiment`, register it with watchdog:
 
 ```bash
-# /run-experiment launches screen session "exp01"
+# /run-experiment launches tmux session "aris-exp01"
 # Then register it:
-python3 tools/watchdog.py --register '{"name":"exp01","type":"training","session":"exp01","gpus":[0,1]}'
+python3 tools/watchdog.py --register '{"name":"exp01","type":"training","session":"aris-exp01","gpus":[0,1]}'
 ```
 
 ### With `/monitor-experiment`
