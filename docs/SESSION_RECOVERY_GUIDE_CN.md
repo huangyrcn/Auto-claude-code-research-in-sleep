@@ -11,7 +11,7 @@ ARIS 工作流可能持续数小时（idea discovery、auto-review loop、overni
 1. **上下文压缩（Context Compaction）** — 当上下文窗口满了，Claude Code 自动压缩之前的消息。压缩后 LLM 只有压缩摘要，可能忘记当前在哪个 stage、哪些实验在跑、下一步该做什么。
 2. **主动开新会话** — 当上下文使用超过约 50% 时，LLM 能力会明显下降。有经验的用户会主动开新 session 以恢复模型满状态能力，而不是等自动压缩。这意味着 LLM 必须从磁盘文件重建项目状态。
 
-ARIS 已经将部分状态持久化到文件（`REVIEW_STATE.json`、`AUTO_REVIEW.md`），但**没有系统性机制确保 LLM 在恢复时去读这些文件**。压缩后，它经常忘记。
+ARIS 已经将部分状态持久化到文件（`research/REVIEW_STATE.json`、`research/AUTO_REVIEW.md`），但**没有系统性机制确保 LLM 在恢复时去读这些文件**。压缩后，它经常忘记。
 
 ## 核心方案：Pipeline Status
 
@@ -25,7 +25,7 @@ ARIS 已经将部分状态持久化到文件（`REVIEW_STATE.json`、`AUTO_REVIE
 ## Pipeline Status
 stage: idea-discovery | implementation | training | paper
 idea: "当前 idea 的一句话描述"
-contract: docs/research_contract.md
+contract: research/contract.md
 current_branch: feature/idea-name
 baseline: "代表数据集 acc=95.2（论文 95.5）"
 training_status: running on server-X, GPU 0-3, tmux=train01, wandb=run_id,
@@ -40,7 +40,7 @@ next: 下一步行动
 |------|------|------|
 | `stage` | 当前工作流阶段 | `training` |
 | `idea` | 在做什么 | `"离散扩散 LM 中的分解注意力 gap"` |
-| `contract` | 指向详细上下文 | `docs/research_contract.md` |
+| `contract` | 指向详细上下文 | `research/contract.md` |
 | `current_branch` | 当前 idea 的 git 分支 | `feature/factorized-gap` |
 | `baseline` | 基线数字用于对比 | `"WikiText-103 PPL=18.2（论文 18.5）"` |
 | `training_status` | 训练总体状态 | `running on b2, GPU 0-3, tmux=exp01` |
@@ -60,9 +60,9 @@ LLM 应在以下情况发生时**立即更新**：
 
 ### 为什么需要 Research Contract
 
-工作流 1（`/idea-discovery`）完成后，`IDEA_REPORT.md` 包含 8-12 个候选 idea。一旦选定一个进入实现阶段，把所有候选都留在上下文中会浪费 LLM 的工作记忆、降低输出质量。
+工作流 1（`/idea-discovery`）完成后，`research/IDEA_REPORT.md` 包含 8-12 个候选 idea。一旦选定一个进入实现阶段，把所有候选都留在上下文中会浪费 LLM 的工作记忆、降低输出质量。
 
-**`docs/research_contract.md`** 解决这个问题：只提取*当前正在做的那一个 idea* 到一份聚焦的工作文档——claim、实验设计、baseline、结果。新 session 读这个，而不是读整个 IDEA_REPORT.md。模板见 [`templates/RESEARCH_CONTRACT_TEMPLATE.md`](../templates/RESEARCH_CONTRACT_TEMPLATE.md)。
+**`research/contract.md`** 解决这个问题：只提取*当前正在做的那一个 idea* 到一份聚焦的工作文档——claim、实验设计、baseline、结果。新 session 读这个，而不是读整个 research/IDEA_REPORT.md。模板见 [`templates/RESEARCH_CONTRACT_TEMPLATE.md`](../templates/RESEARCH_CONTRACT_TEMPLATE.md)。
 
 - **创建时机**：选定 idea 时（工作流 1 → 工作流 1.5）
 - **更新时机**：baseline 复现后、实验完成后、做出关键决策后
@@ -73,7 +73,7 @@ LLM 应在以下情况发生时**立即更新**：
 **新会话或压缩后**，LLM 按以下顺序读取：
 
 1. `CLAUDE.md` → `## Pipeline Status`（30 秒定位）
-2. `docs/research_contract.md`（当前 idea 的聚焦上下文 — 不是整个 IDEA_REPORT）
+2. `research/contract.md`（当前 idea 的聚焦上下文 — 不是整个 IDEA_REPORT）
 3. 项目笔记或日志文件（如有，恢复调试线索、决策理由）
 4. 如果 `active_tasks`/`training_status` 非空 → 检查远程 session，重建监控
 
@@ -93,7 +93,7 @@ Pipeline Status 更新时机：
 
 新会话或压缩后恢复：
 1. 读 ## Pipeline Status
-2. 读 docs/research_contract.md（当前 idea 的聚焦上下文）
+2. 读 research/contract.md（当前 idea 的聚焦上下文）
 3. 读项目笔记（如有，例如实验日志、决策理由）
 4. 如有 active_tasks → 检查远程状态，重建监控
 5. 继续工作，不问用户
@@ -163,8 +163,8 @@ if [ -n "$STATUS" ]; then
 fi
 
 # 2. Check for research_contract.md
-if [ -f "$PROJECT_DIR/docs/research_contract.md" ]; then
-  OUTPUT="$OUTPUT\n\n[session-restore] docs/research_contract.md exists — read it to restore full idea context."
+if [ -f "$PROJECT_DIR/research/contract.md" ]; then
+  OUTPUT="$OUTPUT\n\n[session-restore] research/contract.md exists — read it to restore full idea context."
 fi
 
 # 3. Check for active training
@@ -172,11 +172,11 @@ if grep -q "training_status:.*running" "$PROJECT_DIR/CLAUDE.md" 2>/dev/null; the
   OUTPUT="$OUTPUT\n\n[session-restore] Active training detected — check remote status and rebuild monitoring."
 fi
 
-# 4. Check for REVIEW_STATE.json (auto-review-loop recovery)
-if [ -f "$PROJECT_DIR/REVIEW_STATE.json" ]; then
-  RS_STATUS=$(python3 -c "import json; d=json.load(open('$PROJECT_DIR/REVIEW_STATE.json')); print(d.get('status',''))" 2>/dev/null)
+# 4. Check for research/REVIEW_STATE.json (auto-review-loop recovery)
+if [ -f "$PROJECT_DIR/research/REVIEW_STATE.json" ]; then
+  RS_STATUS=$(python3 -c "import json; d=json.load(open('$PROJECT_DIR/research/REVIEW_STATE.json')); print(d.get('status',''))" 2>/dev/null)
   if [ "$RS_STATUS" = "in_progress" ]; then
-    OUTPUT="$OUTPUT\n\n[session-restore] REVIEW_STATE.json found (in_progress) — auto-review-loop can resume."
+    OUTPUT="$OUTPUT\n\n[session-restore] research/REVIEW_STATE.json found (in_progress) — auto-review-loop can resume."
   fi
 fi
 
@@ -254,10 +254,10 @@ CWD=$(pwd)
 echo "[pre-compact] Context compaction is about to happen."
 echo "[pre-compact] Ensure these are up to date:"
 echo "  1. CLAUDE.md Pipeline Status (stage, idea, active_tasks, next)"
-echo "  2. docs/research_contract.md (current idea context and results)"
+echo "  2. research/contract.md (current idea context and results)"
 echo "  3. EXPERIMENT_TRACKER.md (any unreported results)"
-echo "  4. REVIEW_STATE.json (if running auto-review-loop)"
-echo "[pre-compact] After compaction, read CLAUDE.md and docs/research_contract.md to recover."
+echo "  4. research/REVIEW_STATE.json (if running auto-review-loop)"
+echo "[pre-compact] After compaction, read CLAUDE.md and research/contract.md to recover."
 HOOKEOF
 chmod +x ~/.claude/hooks/pre-compact-remind.sh
 ```
@@ -283,7 +283,7 @@ CWD=$(pwd)
 
 FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
 case "$FILE_PATH" in
-  */CLAUDE.md|*/IDEA_REPORT.md|*/AUTO_REVIEW.md|*/REVIEW_STATE.json|*/EXPERIMENT_TRACKER.md|*/research_contract.md)
+  */CLAUDE.md|*/research/IDEA_REPORT.md|*/research/AUTO_REVIEW.md|*/research/REVIEW_STATE.json|*/EXPERIMENT_TRACKER.md|*/research_contract.md)
     exit 0 ;;
 esac
 

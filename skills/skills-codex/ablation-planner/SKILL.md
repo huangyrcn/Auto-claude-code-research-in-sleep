@@ -26,8 +26,8 @@ Systematically design ablation studies that answer the questions reviewers will 
 
 Read available project files to build the full picture:
 
-- Method description and components (from `docs/research_contract.md`, project notes, or method docs)
-- Current experiment results (from `EXPERIMENT_LOG.md`, `EXPERIMENT_TRACKER.md`, or W&B)
+- Method description and components (from `research/contract.md`, project notes, or method docs)
+- Current experiment results (from `research/EXPERIMENT_LOG.md`, `EXPERIMENT_TRACKER.md`, or W&B)
 - Confirmed and intended claims (from `/result-to-claim` output or project notes)
 - Available compute resources (from server notes, run configs, or user-provided budget)
 
@@ -116,8 +116,8 @@ Before running anything, check:
 1. Create configs or scripts for each ablation (config-only changes first)
 2. Smoke test each ablation before the full run
 3. Run in the suggested order, using descriptive names (for example, `ablation-no-module-X`)
-4. Track results in `EXPERIMENT_LOG.md`
-5. After all ablations complete, update `findings.md` with insights
+4. Track results in `research/EXPERIMENT_LOG.md`
+5. After all ablations complete, update `research/findings.md` with insights
 
 ## Rules
 
@@ -127,4 +127,4 @@ Before running anything, check:
 - If total compute exceeds budget, propose cuts and ask for re-prioritization - do not silently drop ablations.
 - Component ablations (remove or replace) take priority over hyperparameter sweeps.
 - Do not generate ablations for components identical to the baseline (no-op ablations).
-- Record all ablation results in `EXPERIMENT_LOG.md`, including negative results (for example, component removal had no effect).
+- Record all ablation results in `research/EXPERIMENT_LOG.md`, including negative results (for example, component removal had no effect).

@@ -44,7 +44,7 @@ Workflow 4:   rebuttal (post-submission external reviews)
 - **MAX_FOLLOWUP_ROUNDS = 3**
 - **AUTO_EXPERIMENT = false** — When `true`, invoke `/experiment-bridge` for reviewer concerns that require new evidence
 - **QUICK_MODE = false** — When `true`, only run Phase 0-3 and stop after strategy
-- **REBUTTAL_DIR = `rebuttal/`**
+- **REBUTTAL_DIR = `writing/rebuttal/`**
 
 > Override: `/rebuttal "paper/" — venue: NeurIPS, character limit: 5000`
 
@@ -69,20 +69,20 @@ Three hard gates. If any fails, do not finalize:
 
 ### Phase 0: Resume or Initialize
 
-1. If `rebuttal/REBUTTAL_STATE.md` exists, resume from the recorded phase
-2. Otherwise, create `rebuttal/` and initialize the output documents
+1. If `writing/rebuttal/REBUTTAL_STATE.md` exists, resume from the recorded phase
+2. Otherwise, create `writing/rebuttal/` and initialize the output documents
 3. Load the paper, reviews, venue rules, and any user-confirmed evidence
 
 ### Phase 1: Validate Inputs and Normalize Reviews
 
 1. Validate that venue rules are explicit
-2. Normalize all reviewer text into `rebuttal/REVIEWS_RAW.md` verbatim
-3. Record metadata in `rebuttal/REBUTTAL_STATE.md`
+2. Normalize all reviewer text into `writing/rebuttal/REVIEWS_RAW.md` verbatim
+3. Record metadata in `writing/rebuttal/REBUTTAL_STATE.md`
 4. If ambiguous, pause and ask
 
 ### Phase 2: Atomize and Classify Reviewer Concerns
 
-Create `rebuttal/ISSUE_BOARD.md`.
+Create `writing/rebuttal/ISSUE_BOARD.md`.
 
 For each atomic concern, record:
 
@@ -96,7 +96,7 @@ For each atomic concern, record:
 
 ### Phase 3: Build Strategy Plan
 
-Create `rebuttal/STRATEGY_PLAN.md`.
+Create `writing/rebuttal/STRATEGY_PLAN.md`.
 
 1. Identify 2-4 global themes resolving shared concerns
 2. Choose a response mode per issue
@@ -113,14 +113,14 @@ Create `rebuttal/STRATEGY_PLAN.md`.
 If the strategy plan identifies issues that require new empirical evidence:
 
 1. Generate a mini experiment plan from the reviewer concerns
-2. Invoke `/experiment-bridge "rebuttal/REBUTTAL_EXPERIMENT_PLAN.md"`
+2. Invoke `/experiment-bridge "writing/rebuttal/REBUTTAL_EXPERIMENT_PLAN.md"`
 3. Wait for results, then update `ISSUE_BOARD.md`
 4. If experiments fail or are inconclusive, switch to `narrow_concession` or `future_work_boundary`
-5. Save experiment results to `rebuttal/REBUTTAL_EXPERIMENTS.md`
+5. Save experiment results to `writing/rebuttal/REBUTTAL_EXPERIMENTS.md`
 
 ### Phase 4: Draft Initial Rebuttal
 
-Create `rebuttal/REBUTTAL_DRAFT_v1.md`.
+Create `writing/rebuttal/REBUTTAL_DRAFT_v1.md`.
 
 Structure:
 
@@ -128,7 +128,7 @@ Structure:
 2. Per-reviewer numbered responses
 3. Short closing
 
-Also generate `rebuttal/PASTE_READY.txt` with exact character count.
+Also generate `writing/rebuttal/PASTE_READY.txt` with exact character count.
 
 ### Phase 5: Safety Validation
 
@@ -161,22 +161,22 @@ spawn_agent:
     Verdict: safe to submit / needs revision
 ```
 
-Save the full response to `rebuttal/MCP_STRESS_TEST.md`. If a hard safety blocker remains, revise before finalizing.
+Save the full response to `writing/rebuttal/MCP_STRESS_TEST.md`. If a hard safety blocker remains, revise before finalizing.
 
 ### Phase 7: Finalize — Two Versions
 
 Produce:
 
-1. **`rebuttal/PASTE_READY.txt`** — strict version, ready to paste
-2. **`rebuttal/REBUTTAL_DRAFT_rich.md`** — extended version with optional sections marked
-3. Update `rebuttal/REBUTTAL_STATE.md`
+1. **`writing/rebuttal/PASTE_READY.txt`** — strict version, ready to paste
+2. **`writing/rebuttal/REBUTTAL_DRAFT_rich.md`** — extended version with optional sections marked
+3. Update `writing/rebuttal/REBUTTAL_STATE.md`
 4. Present the remaining risks and any lines needing manual approval
 
 ### Phase 8: Follow-Up Rounds
 
 When new reviewer comments arrive:
 
-1. Append them to `rebuttal/FOLLOWUP_LOG.md`
+1. Append them to `writing/rebuttal/FOLLOWUP_LOG.md`
 2. Link to existing issues or create new ones
 3. Draft the delta reply only
 4. Re-run safety lints

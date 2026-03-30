@@ -21,14 +21,14 @@ Unlike papers (dense prose, 8-15 pages), posters are **visual-first**: one page,
 - **POSTER_SIZE = `A0`** — Paper size. Options: `A0` (841x1189mm, default), `A1` (594x841mm).
 - **ORIENTATION = `landscape`** — Orientation. Options: `landscape` (default), `portrait`.
 - **COLUMNS = 4** — Number of content columns. Typical: 4 for landscape A0 (IMRAD), **3 for portrait A0** (research consensus), 2 for portrait A1. Portrait A0 should NEVER use 4 columns — text becomes too narrow and unreadable.
-- **PAPER_DIR = `paper/`** — Directory containing the compiled paper (main.tex + figures/).
-- **OUTPUT_DIR = `poster/`** — Output directory for all poster files.
+- **PAPER_DIR = `writing/paper/`** — Directory containing the compiled paper (main.tex + figures/).
+- **OUTPUT_DIR = `writing/poster/`** — Output directory for all poster files.
 - **REVIEWER_MODEL = `gpt-5.4`** — Model used via Codex MCP for poster review.
 - **AUTO_PROCEED = false** — At each checkpoint, **always wait for explicit user confirmation**. Set `true` only if user explicitly requests fully autonomous mode.
 - **COMPILER = `latexmk`** — LaTeX build tool.
 - **ENGINE = `pdflatex`** — LaTeX engine. Use `xelatex` for CJK text.
 
-> 💡 Override: `/paper-poster "paper/" — venue: CVPR, size: A1, orientation: portrait, columns: 3`
+> 💡 Override: `/paper-poster "writing/paper/" — venue: CVPR, size: A1, orientation: portrait, columns: 3`
 
 ## Venue Color Schemes
 
@@ -50,7 +50,7 @@ Use **deep, saturated** colors for primary — pastel/light colors wash out on l
 
 ## State Persistence (Compact Recovery)
 
-Poster generation can be long. Persist state to `poster/POSTER_STATE.json` after each phase:
+Poster generation can be long. Persist state to `writing/poster/POSTER_STATE.json` after each phase:
 
 ```json
 {
@@ -361,15 +361,15 @@ Similarly, `\rowcolor` in tables should use 15% intensity: `\rowcolor{primary!15
    ls $PAPER_DIR/figures/
    ```
 
-3. **Backup existing poster**: if `poster/` exists, copy to `poster-backup-{timestamp}/`
+3. **Backup existing poster**: if `writing/poster/` exists, copy to `writing/poster-backup-{timestamp}/`
 
-4. **Create output directory**: `mkdir -p poster/figures`
+4. **Create output directory**: `mkdir -p writing/poster/figures`
 
 5. **Copy figures** to poster directory:
    ```bash
    # IMPORTANT: Use cp, NOT ln -sf (symlinks)
    # pdflatex often fails to resolve symlinks across directories
-   cp paper/figures/selected_figure.pdf poster/figures/
+   cp writing/paper/figures/selected_figure.pdf writing/poster/figures/
    ```
 
    > ⚠️ **Never use symlinks** for poster figures. `pdflatex` cannot reliably follow symlinks across directories. Always `cp` the actual files.
@@ -381,8 +381,8 @@ Similarly, `\rowcolor` in tables should use 15% intensity: `\rowcolor{primary!15
    python3 -c "
    from pdf2image import convert_from_path
    for name in ['paradigm', 'architecture', 'results', 'hallucination']:
-       imgs = convert_from_path(f'poster/figures/{name}.pdf', dpi=300)
-       imgs[0].save(f'poster/figures/{name}.png', 'PNG')
+       imgs = convert_from_path(f'writing/poster/figures/{name}.pdf', dpi=300)
+       imgs[0].save(f'writing/poster/figures/{name}.png', 'PNG')
    "
    ```
 
@@ -390,11 +390,11 @@ Similarly, `\rowcolor` in tables should use 15% intensity: `\rowcolor{primary!15
 
 7. **Detect CJK**: if paper contains Chinese/Japanese/Korean text, set ENGINE to `xelatex`
 
-8. **Check for resume**: read `poster/POSTER_STATE.json` if it exists
+8. **Check for resume**: read `writing/poster/POSTER_STATE.json` if it exists
 
 ### Phase 1: Content Extraction
 
-Read each section from `paper/sections/*.tex` and extract poster-appropriate content:
+Read each section from `writing/paper/sections/*.tex` and extract poster-appropriate content:
 
 **Extraction rules** — a poster shows ~30-40% of the paper's content:
 
@@ -411,7 +411,7 @@ Read each section from `paper/sections/*.tex` and extract poster-appropriate con
 
 > ⚠️ **No abstract paragraph on poster.** Replace with a stat banner: 3-4 large-number callout boxes showing headline results. This is the single highest-impact change for 60-second comprehension.
 
-**Output**: `poster/POSTER_CONTENT_PLAN.md` — structured markdown showing exactly what goes where, with word counts per box.
+**Output**: `writing/poster/POSTER_CONTENT_PLAN.md` — structured markdown showing exactly what goes where, with word counts per box.
 
 **🚦 Checkpoint:**
 
@@ -433,9 +433,9 @@ Proceed with this layout? Or adjust content selection?
 
 ### Phase 2: Figure Selection & Layout
 
-1. **Inventory** all figures in `paper/figures/`:
+1. **Inventory** all figures in `writing/paper/figures/`:
    ```bash
-   ls -la paper/figures/*.{pdf,png,jpg,svg} 2>/dev/null
+   ls -la writing/paper/figures/*.{pdf,png,jpg,svg} 2>/dev/null
    ```
 
 2. **Rank by poster importance**:
@@ -455,7 +455,7 @@ Proceed with this layout? Or adjust content selection?
 
 ### Phase 3: Generate Poster LaTeX
 
-Create `poster/main.tex` using **article class + geometry + tcbposter**.
+Create `writing/poster/main.tex` using **article class + geometry + tcbposter**.
 
 **Template structure** (validated through testing):
 
@@ -647,7 +647,7 @@ cd poster && latexmk -pdf -interaction=nonstopmode main.tex
    - `grouping levels=255` → **STOP. Switch from beamer to article class.** This is not fixable by removing styles.
    - Missing package → `tlmgr install <package>`
    - `File not found: adjustbox.sty` → Remove `\usepackage{adjustbox}` and any `max height` options
-   - File not found → verify `poster/figures/` has the file (not a broken symlink)
+   - File not found → verify `writing/poster/figures/` has the file (not a broken symlink)
    - Overfull boxes → reduce text or figure size
 3. Recompile
 
@@ -658,7 +658,7 @@ tlmgr install type1cm pdfcol tikzfill
 
 **Verification**:
 ```bash
-pdfinfo poster/main.pdf
+pdfinfo writing/poster/main.pdf
 # Check: Pages: 1, Page size: ~3370.39 x 2383.94 pts (A0 landscape)
 ```
 
@@ -676,16 +676,16 @@ pdfinfo poster/main.pdf
 
 ```python
 import fitz
-doc = fitz.open('poster/main.pdf')
+doc = fitz.open('writing/poster/main.pdf')
 page = doc[0]
 pix = page.get_pixmap(dpi=200)  # 200 DPI for visual review (higher than 150 preview)
-pix.save('poster/poster_review.png')
+pix.save('writing/poster/poster_review.png')
 doc.close()
 ```
 
 **Step 2: Claude visual assessment**
 
-Read the rendered `poster/poster_review.png` and perform a **STRICT visual review** with the following rubric (score 1-10):
+Read the rendered `writing/poster/poster_review.png` and perform a **STRICT visual review** with the following rubric (score 1-10):
 
 **Critical checks** (must all pass, any failure = score ≤ 5):
 1. **Content accuracy** — No fabricated data, all numbers match paper
@@ -714,7 +714,7 @@ MAX_ITERATIONS = 5
 SCORE_THRESHOLD = 9
 
 for iteration in 1..MAX_ITERATIONS:
-    1. Render poster to poster/poster_v{iteration}.png (200 DPI)
+    1. Render poster to writing/poster/poster_v{iteration}.png (200 DPI)
     2. Claude reads the PNG and performs STRICT visual review
     3. Score the poster (1-10) with detailed feedback
     4. If score >= SCORE_THRESHOLD → PASS, proceed to Phase 6
@@ -724,7 +724,7 @@ for iteration in 1..MAX_ITERATIONS:
        c. Apply fixes to main.tex
        d. Recompile (Phase 4 error loop)
        e. Continue to next iteration
-    6. Save all versions: poster/poster_v{iteration}.png
+    6. Save all versions: writing/poster/poster_v{iteration}.png
 ```
 
 > ⚠️ **All versions are preserved.** Never overwrite previous renders. Save as `poster_v1.png`, `poster_v2.png`, etc. This allows comparison and rollback.
@@ -738,11 +738,11 @@ For poster elements that need custom illustrations (e.g., hero architecture diag
 2. Call `mcp__illustrator__run` with the specification
 3. Claude reviews the generated image for accuracy
 4. Iterate until score ≥ 9 or max 3 attempts
-5. Save final illustration to `poster/figures/` and embed in LaTeX
+5. Save final illustration to `writing/poster/figures/` and embed in LaTeX
 
 **Step 4: Save visual review log**
 
-Append all iteration scores and feedback to `poster/POSTER_VISUAL_REVIEW.md`:
+Append all iteration scores and feedback to `writing/poster/POSTER_VISUAL_REVIEW.md`:
 
 ```markdown
 # Visual Review Log
@@ -791,9 +791,9 @@ mcp__codex__codex:
     - Overall: Ready to print? (Yes / Needs revision / Major issues)
 ```
 
-Apply CRITICAL and MAJOR fixes to `poster/main.tex`. Recompile if changes were made.
+Apply CRITICAL and MAJOR fixes to `writing/poster/main.tex`. Recompile if changes were made.
 
-Save review to `poster/POSTER_REVIEW.md`.
+Save review to `writing/poster/POSTER_REVIEW.md`.
 
 > ⚠️ **Important**: After applying review fixes, proceed to Phase 6 only when the poster is finalized. PPTX and SVG must be generated from the **final** LaTeX/PDF — never from an intermediate version.
 
@@ -809,10 +809,10 @@ Generate a native PPTX using `python-pptx` (not pandoc — pandoc conversion is 
 python3 -c "import pptx" 2>/dev/null || pip install python-pptx
 ```
 
-Write a Python script `poster/generate_pptx.py` that:
+Write a Python script `writing/poster/generate_pptx.py` that:
 1. Creates a single-slide PPTX with poster dimensions (A0 landscape: 1189mm x 841mm)
 2. Replicates the 4-column layout using positioned text boxes
-3. **Embeds PNG figures** (from poster/figures/*.png — NOT PDFs, python-pptx cannot embed PDFs)
+3. **Embeds PNG figures** (from writing/poster/figures/*.png — NOT PDFs, python-pptx cannot embed PDFs)
 4. Applies venue color scheme (primary/secondary/accent) to title bar and section headers
 5. Keeps all text editable (not images of text)
 6. Uses large font sizes matching the PDF (title 86pt, body 34pt, headers 42pt, stats 68pt)
@@ -835,7 +835,7 @@ def add_image(left, top, w, filename):
 
 ```bash
 cd poster && python3 generate_pptx.py
-# Output: poster/poster.pptx
+# Output: writing/poster/poster.pptx
 ```
 
 #### 6.2 SVG (for Adobe Illustrator)
@@ -847,10 +847,10 @@ Convert the compiled PDF to editable SVG. **Preferred method: PyMuPDF** (always 
 python3 -c "import fitz" 2>/dev/null || pip install pymupdf
 python3 -c "
 import fitz
-doc = fitz.open('poster/main.pdf')
+doc = fitz.open('writing/poster/main.pdf')
 page = doc[0]
 svg = page.get_svg_image()
-with open('poster/poster.svg', 'w') as f:
+with open('writing/poster/poster.svg', 'w') as f:
     f.write(svg)
 doc.close()
 print('SVG saved')
@@ -859,10 +859,10 @@ print('SVG saved')
 
 ```bash
 # Fallback 1: pdf2svg (if installed)
-which pdf2svg && pdf2svg poster/main.pdf poster/poster.svg
+which pdf2svg && pdf2svg writing/poster/main.pdf writing/poster/poster.svg
 
 # Fallback 2: inkscape
-which inkscape && inkscape poster/main.pdf --export-type=svg --export-filename=poster/poster.svg
+which inkscape && inkscape writing/poster/main.pdf --export-type=svg --export-filename=writing/poster/poster.svg
 ```
 
 > ⚠️ **SVG inherits all layout issues from PDF.** If the PDF has whitespace gaps or clipped figures, the SVG will too. Always fix the PDF first.
@@ -870,7 +870,7 @@ which inkscape && inkscape poster/main.pdf --export-type=svg --export-filename=p
 > 💡 **PyMuPDF bonus**: Can also generate PNG previews for quick visual inspection:
 > ```python
 > pix = page.get_pixmap(dpi=150)
-> pix.save('poster/poster_preview.png')
+> pix.save('writing/poster/poster_preview.png')
 > ```
 
 #### 6.3 Component-based PPTX (Recommended — PDF→independent shapes)
@@ -885,7 +885,7 @@ from pptx import Presentation
 from pptx.util import Mm
 from pptx.dml.color import RGBColor
 
-doc = fitz.open('poster/main.pdf')
+doc = fitz.open('writing/poster/main.pdf')
 page = doc[0]
 pw, ph = page.rect.width, page.rect.height
 
@@ -949,7 +949,7 @@ for name, (col, r0, span, r1) in regions.items():
     slide.shapes.add_picture(img_path, Mm(left), Mm(top),
                              Mm(right - left), Mm(bottom - top))
 
-prs.save('poster/poster_components.pptx')
+prs.save('writing/poster/poster_components.pptx')
 doc.close()
 shutil.rmtree(tmpdir)
 ```
@@ -968,7 +968,7 @@ shutil.rmtree(tmpdir)
 
 ### Phase 8: Poster Speech Script
 
-Generate `poster/POSTER_SPEECH.md` — a complete script for presenting the poster at a poster session.
+Generate `writing/poster/POSTER_SPEECH.md` — a complete script for presenting the poster at a poster session.
 
 **Structure**:
 
@@ -1010,7 +1010,7 @@ Generate `poster/POSTER_SPEECH.md` — a complete script for presenting the post
 📋 Poster generation complete:
 - Type: [VENUE] poster ([POSTER_SIZE] [ORIENTATION])
 - Files:
-  poster/
+  writing/poster/
   ├── main.tex                # LaTeX source (editable)
   ├── main.pdf                # Print-ready PDF (primary output)
   ├── poster_components.pptx  # PPTX with per-card movable shapes (recommended)
@@ -1047,7 +1047,7 @@ Next steps:
 
 ### Content
 - **Less text is more.** Target 300-500 words total. Each bullet: 5-8 words max. If it reads like a sentence, it's too long.
-- **Do NOT fabricate data.** All numbers must come from `paper/sections/*.tex`.
+- **Do NOT fabricate data.** All numbers must come from `writing/paper/sections/*.tex`.
 - **No abstract paragraph.** Replace with stat banner (3-4 big-number callout boxes).
 - **Figures should occupy 40-50% of poster area.** Posters are visual-first.
 - **Use `\posterfig` macro** for all figures to ensure consistent spacing.
@@ -1084,7 +1084,7 @@ Next steps:
 Parameters can be passed inline with `—` separator:
 
 ```
-/paper-poster "paper/" — venue: CVPR, size: A1, orientation: portrait, columns: 3
+/paper-poster "writing/paper/" — venue: CVPR, size: A1, orientation: portrait, columns: 3
 ```
 
 | Parameter | Default | Description |

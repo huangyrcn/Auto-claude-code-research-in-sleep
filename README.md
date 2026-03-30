@@ -62,7 +62,7 @@ ARIS reads the paper → finds its weaknesses → clones the codebase → genera
 | `max followup rounds` | `3` | Per-reviewer follow-up round limit |
 
 Three safety gates — rebuttal will NOT finalize if any fails:
-- 🔒 **No fabrication** — every claim maps to paper/review/user-confirmed result
+- 🔒 **No fabrication** — every claim maps to writing/paper/review/user-confirmed result
 - 🔒 **No overpromise** — every promise is user-approved
 - 🔒 **Full coverage** — every reviewer concern is tracked
 
@@ -71,8 +71,8 @@ Two outputs: `PASTE_READY.txt` (exact char count, paste to venue) + `REBUTTAL_DR
 **After acceptance** — your paper is in, now prepare the presentation:
 
 ```
-/paper-slides "paper/"     # → Beamer PDF + PPTX + speaker notes + Q&A prep
-/paper-poster "paper/"     # → A0/A1 poster PDF + editable PPTX + SVG
+/paper-slides "writing/paper/"     # → Beamer PDF + PPTX + speaker notes + Q&A prep
+/paper-poster "writing/paper/"     # → A0/A1 poster PDF + editable PPTX + SVG
 ```
 
 > *💡 From idea to paper to podium — one toolchain. 🌱*
@@ -90,7 +90,7 @@ Two outputs: `PASTE_READY.txt` (exact char count, paste to venue) + `REBUTTAL_DR
 
 - **2026-03-30** — ![NEW](https://img.shields.io/badge/NEW-red?style=flat-square) ☁️ **[Vast.ai GPU rental](skills/vast-gpu/SKILL.md)** — no GPU? `gpu: vast` in CLAUDE.md, ARIS auto-rents cheapest GPU, runs experiment, destroys when done. Community contribution by [@YIHONG-JIN](https://github.com/YIHONG-JIN). 🔧 **MiniMax M2.7 upgrade** — API URL fix + model upgrade + tests. By [@octo-patch](https://github.com/octo-patch)
 - **2026-03-27** — ![NEW](https://img.shields.io/badge/NEW-red?style=flat-square) 📄 **IEEE venue support** — `IEEE_JOURNAL` (TPAMI/TIP/TNNLS) + `IEEE_CONF` (ICC/GLOBECOM/INFOCOM/ICASSP). Official IEEEtran templates. **9 venue families now.** 🔎 **[Semantic Scholar](skills/semantic-scholar/SKILL.md)** — search published venue papers beyond arXiv (`— sources: semantic-scholar`). Community contributions by [@ypd666](https://github.com/ypd666)
-- **2026-03-26** — ![NEW](https://img.shields.io/badge/NEW-red?style=flat-square) 📄 **Document-based input** — drop a `RESEARCH_BRIEF.md` in your project, `/idea-discovery` and `/research-pipeline` auto-detect it. No more squeezing complex research directions into one line. [Template](templates/RESEARCH_BRIEF_TEMPLATE.md)
+- **2026-03-26** — ![NEW](https://img.shields.io/badge/NEW-red?style=flat-square) 📄 **Document-based input** — drop a `research/RESEARCH_BRIEF.md` in your project, `/idea-discovery` and `/research-pipeline` auto-detect it. No more squeezing complex research directions into one line. [Template](templates/RESEARCH_BRIEF_TEMPLATE.md)
 - **2026-03-24** — ![NEW](https://img.shields.io/badge/NEW-red?style=flat-square) 📝 **[Workflow 4: `/rebuttal`](skills/rebuttal/SKILL.md)** — post-submission rebuttal pipeline. Parse reviews → atomize → strategy → draft → safety check → GPT-5.4 stress test → finalize (strict + rich versions) → follow-up rounds. 3 safety gates (no fabrication, no overpromise, full coverage). `quick mode` for analysis only. `auto experiment` for supplementary experiments. Designed from 5 successful rebuttal case studies + 3 rounds GPT-5.4 xhigh design review
 - **2026-03-23** — ![NEW](https://img.shields.io/badge/NEW-red?style=flat-square) 🔧 **3 skills integrated into core workflows**: `/training-check`, `/result-to-claim`, `/ablation-planner`. 📦 **`compact` mode** — generate lean summary files for short-context models and session recovery (`— compact: true`). 🔄 **research-refine checkpoint** — auto-resume after interruption. Community contributions by [@JingxuanKang](https://github.com/JingxuanKang) & [@couragec](https://github.com/couragec)
 - **2026-03-22** — ![NEW](https://img.shields.io/badge/NEW-red?style=flat-square) 📋 **[Templates](templates/)** — input templates for every workflow. 📄 **7 venue templates** — CVPR, ACL, AAAI, ACM MM added. 🛡️ **Anti-hallucination fix** — Workflow 2 enforces DBLP → CrossRef → [VERIFY]. 🔗 **`base repo`** — clone a GitHub repo as base codebase (`— base repo: https://github.com/org/project`)
@@ -157,7 +157,7 @@ claude
 > | `venue` | `ICLR` | Target venue: `ICLR`, `NeurIPS`, `ICML`, `CVPR`, `ACL`, `AAAI`, `ACM`. Determines LaTeX style file and page limit |
 > | `base repo` | `false` | GitHub repo URL to clone as base codebase (e.g., `— base repo: https://github.com/org/project`). No code? Build on top of an open-source project |
 > | `gpu` | `local` | GPU target: `local` (default), `remote` (SSH server), or `vast` (rent on-demand from [Vast.ai](https://vast.ai) — auto-provision, auto-destroy) |
-> | `compact` | `false` | Generate compact summary files (`IDEA_CANDIDATES.md`, `findings.md`, `EXPERIMENT_LOG.md`) for short-context models and session recovery |
+> | `compact` | `false` | Generate compact summary files (`research/IDEA_CANDIDATES.md`, `research/findings.md`, `research/EXPERIMENT_LOG.md`) for short-context models and session recovery |
 > | `ref paper` | `false` | Reference paper to build on (PDF path or arXiv URL). Summarized first, then ideas extend/improve it. Combine with `base repo` for paper+code workflows |
 >
 > ```
@@ -326,7 +326,7 @@ Don't have a concrete idea yet? Just give a research direction — `/idea-discov
 7. 🔬 **Refine** the top idea into a problem-anchored proposal via iterative GPT-5.4 review
 8. 🧪 **Plan** claim-driven experiments with ablations, budgets, and run order
 
-The output is a ranked `IDEA_REPORT.md` plus a refined proposal (`refine-logs/FINAL_PROPOSAL.md`) and experiment plan (`refine-logs/EXPERIMENT_PLAN.md`) for the top idea. Dead-end ideas are documented too, saving future exploration.
+The output is a ranked `research/IDEA_REPORT.md` plus a refined proposal (`research/refine/FINAL_PROPOSAL.md`) and experiment plan (`research/refine/EXPERIMENT_PLAN.md`) for the top idea. Dead-end ideas are documented too, saving future exploration.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -396,7 +396,7 @@ The output is a ranked `IDEA_REPORT.md` plus a refined proposal (`refine-logs/FI
 
 Already have an experiment plan (from Workflow 1 or your own)? `/experiment-bridge` turns it into running code:
 
-1. 📋 **Parse** the experiment plan (`refine-logs/EXPERIMENT_PLAN.md`)
+1. 📋 **Parse** the experiment plan (`research/refine/EXPERIMENT_PLAN.md`)
 2. 💻 **Implement** experiment scripts (reuse existing code, add proper argparse/logging/seeds)
 3. 🔍 **GPT-5.4 code review** — cross-model review catches logic bugs before wasting GPU hours (`code review: true` by default)
 4. ✅ **Sanity check** — run the smallest experiment first to catch runtime bugs
@@ -431,7 +431,7 @@ Already have an experiment plan (from Workflow 1 or your own)? `/experiment-brid
 
 **Skills involved:** `experiment-bridge` + `run-experiment` + `monitor-experiment`
 
-> 💡 **One-command shortcut:** `/experiment-bridge` reads `refine-logs/EXPERIMENT_PLAN.md` automatically. Or point it to any plan: `/experiment-bridge "my_plan.md"`.
+> 💡 **One-command shortcut:** `/experiment-bridge` reads `research/refine/EXPERIMENT_PLAN.md` automatically. Or point it to any plan: `/experiment-bridge "my_plan.md"`.
 
 > ⚙️ `CODE_REVIEW`, `AUTO_DEPLOY`, `SANITY_FIRST`, `MAX_PARALLEL_RUNS` are configurable — see [Customization](#%EF%B8%8F-customization).
 
@@ -482,7 +482,7 @@ Already have an experiment plan (from Workflow 1 or your own)? `/experiment-brid
 - 🧠 **Prefer reframing over new experiments** — when both can address a weakness, chooses the cheaper path
 - 🪞 **No hiding weaknesses** — explicit rule: "Do NOT hide weaknesses to game a positive score"
 - 🔧 **Fix before re-review** — must actually implement fixes before resubmitting; no empty promises
-- 💾 **Compact recovery** — persists state (`REVIEW_STATE.json`) after each round. If the context window fills up and auto-compacts mid-loop, the workflow reads the state file and resumes from where it left off — no human intervention needed
+- 💾 **Compact recovery** — persists state (`research/REVIEW_STATE.json`) after each round. If the context window fills up and auto-compacts mid-loop, the workflow reads the state file and resumes from where it left off — no human intervention needed
 
 > ⚙️ MAX_ROUNDS, score threshold, and GPU limits are configurable — see [Customization](#%EF%B8%8F-customization).
 
@@ -513,7 +513,7 @@ Already have an experiment plan (from Workflow 1 or your own)? `/experiment-brid
 │        │              │                           │           │
 │        ▼              ▼                           ▼           │
 │   ┌──────────────────────────────────────────────────┐       │
-│   │ NARRATIVE_REPORT.md ──► PAPER_PLAN.md ──► paper/ │       │
+│   │ NARRATIVE_REPORT.md ──► PAPER_PLAN.md ──► writing/paper/ │       │
 │   │    (input)             (outline)      (LaTeX+PDF)│       │
 │   └──────────────────────────────────────────────────┘       │
 │                                                               │
@@ -533,7 +533,7 @@ Already have an experiment plan (from Workflow 1 or your own)? `/experiment-brid
 
 **Input:** A `NARRATIVE_REPORT.md` describing the research: claims, experiments, results, figures. The more detailed the narrative (especially figure descriptions and quantitative results), the better the output. See [`templates/NARRATIVE_REPORT_TEMPLATE.md`](templates/NARRATIVE_REPORT_TEMPLATE.md) for a complete example.
 
-**Output:** A submission-ready `paper/` directory with LaTeX source, clean `.bib` (only cited entries), and compiled PDF.
+**Output:** A submission-ready `writing/paper/` directory with LaTeX source, clean `.bib` (only cited entries), and compiled PDF.
 
 **Key features:**
 - 📐 **Claims-Evidence Matrix** — every claim maps to evidence, every experiment supports a claim
@@ -652,7 +652,7 @@ Got reviews back? `/rebuttal` parses them, builds a strategy, and drafts a venue
 > ⚙️ `VENUE`, `AUTO_EXPERIMENT`, `QUICK_MODE`, `MAX_STRESS_TEST_ROUNDS` are configurable — see [Customization](#%EF%B8%8F-customization).
 
 **Three safety gates — rebuttal will NOT finalize if any fails:**
-- 🔒 **Provenance** — every claim maps to paper/review/user-confirmed result. No fabrication.
+- 🔒 **Provenance** — every claim maps to writing/paper/review/user-confirmed result. No fabrication.
 - 🔒 **Commitment** — every promise is user-approved. No overpromising.
 - 🔒 **Coverage** — every reviewer concern is tracked. Nothing disappears.
 
@@ -803,7 +803,7 @@ cp -r skills/experiment-bridge ~/.claude/skills/
 # Workflow 3: Paper Writing
 > /paper-writing "NARRATIVE_REPORT.md"               # full pipeline
 > /paper-plan "NARRATIVE_REPORT.md"                  # just outline
-> /paper-compile "paper/"                            # just compile
+> /paper-compile "writing/paper/"                            # just compile
 
 # Full Pipeline
 > /research-pipeline "your research direction"       # Workflow 1 → 2 → 3 end-to-end
@@ -1314,7 +1314,7 @@ Don't have Claude / OpenAI API access? You can swap in other models — same cro
 | **Alt H** 🆕 | Antigravity (Claude Opus 4.6 / Gemini 3.1 Pro) | GPT-5.4 (Codex MCP) or any via llm-chat | No | Optional | [ANTIGRAVITY_ADAPTATION](docs/ANTIGRAVITY_ADAPTATION.md) |
 | **Alt I** 🆕 | Codex CLI | Gemini direct API (`gemini-review` MCP) | No | No | [CODEX_GEMINI_REVIEW_GUIDE](docs/CODEX_GEMINI_REVIEW_GUIDE.md) |
 
-**Alt C** supports tested providers: GLM (Z.ai), Kimi (Moonshot), LongCat (Meituan) as executors; DeepSeek, MiniMax as reviewers. Any OpenAI-compatible API should also work via the generic [`llm-chat`](mcp-servers/llm-chat/) MCP server. **Alt D** uses [Alibaba Coding Plan](https://bailian.console.aliyun.com/) — one API key for both executor and reviewer, 4 models included (Kimi, Qwen, GLM, MiniMax). **Alt E** uses [ModelScope](https://www.modelscope.cn/) — **free** (2000 calls/day), one key, no automation restrictions. **Alt G** keeps Codex as executor but swaps the reviewer to Claude Code CLI via the local `claude-review` MCP bridge, with async polling for long paper/review prompts. **Alt H** uses [Google Antigravity](https://antigravity.google/) as the executor with native SKILL.md support — choose Claude Opus 4.6 (Thinking) or Gemini 3.1 Pro (high) as the execution model. **Alt I** keeps Codex as executor, adds only a thin `skills-codex-gemini-review` overlay, and routes the reviewer-aware predefined skills through the local `gemini-review` MCP bridge with direct Gemini API by default. It is the closest Gemini analogue to the existing Codex+Claude review path, while minimizing skill changes and now also covers poster PNG review via the same bridge. Free-tier availability, rate limits, and data-use terms remain subject to Google's current policy.
+**Alt C** supports tested providers: GLM (Z.ai), Kimi (Moonshot), LongCat (Meituan) as executors; DeepSeek, MiniMax as reviewers. Any OpenAI-compatible API should also work via the generic [`llm-chat`](mcp-servers/llm-chat/) MCP server. **Alt D** uses [Alibaba Coding Plan](https://bailian.console.aliyun.com/) — one API key for both executor and reviewer, 4 models included (Kimi, Qwen, GLM, MiniMax). **Alt E** uses [ModelScope](https://www.modelscope.cn/) — **free** (2000 calls/day), one key, no automation restrictions. **Alt G** keeps Codex as executor but swaps the reviewer to Claude Code CLI via the local `claude-review` MCP bridge, with async polling for long writing/paper/review prompts. **Alt H** uses [Google Antigravity](https://antigravity.google/) as the executor with native SKILL.md support — choose Claude Opus 4.6 (Thinking) or Gemini 3.1 Pro (high) as the execution model. **Alt I** keeps Codex as executor, adds only a thin `skills-codex-gemini-review` overlay, and routes the reviewer-aware predefined skills through the local `gemini-review` MCP bridge with direct Gemini API by default. It is the closest Gemini analogue to the existing Codex+Claude review path, while minimizing skill changes and now also covers poster PNG review via the same bridge. Free-tier availability, rate limits, and data-use terms remain subject to Google's current policy.
 
 \* Alt G normally relies on local Codex CLI and Claude Code CLI logins. Direct API keys are optional, not required.
 
@@ -1410,10 +1410,10 @@ claude
 
 ### Planned
 
-- [ ] **Daemon mode** — auto-restart Claude Code session via `launchd`/`systemd` for true unattended operation. Currently the orchestration layer requires an active CLI session; state files (`REVIEW_STATE.json`, `AUTO_REVIEW.md`) support resuming across sessions, but relaunch is manual ([#11](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep/issues/11))
+- [ ] **Daemon mode** — auto-restart Claude Code session via `launchd`/`systemd` for true unattended operation. Currently the orchestration layer requires an active CLI session; state files (`research/REVIEW_STATE.json`, `research/AUTO_REVIEW.md`) support resuming across sessions, but relaunch is manual ([#11](https://github.com/wanshuiyin/Auto-claude-code-research-in-sleep/issues/11))
 - [ ] **Reference-style figure generation** — read figures from reference PDFs → identify chart type, color scheme, layout → generate same-style figures with your own data. Sub-goal remaining: **Data charts** (extract color/font style → matplotlib rcParams). Method diagrams ✅ solved by `paper-illustration`
 - [ ] **Workflow execution report** — after each workflow (1/1.5/2/3) completes, auto-generate a structured summary: what was done, key decisions made, experiments run, results obtained, scores, and time spent. Output as `WORKFLOW_REPORT.md` for progress tracking, team reporting, and supervisor updates
-- [x] **Document-based pipeline input** — `/idea-discovery` and `/research-pipeline` auto-detect `RESEARCH_BRIEF.md` in project root. Detailed context replaces one-line prompt. Template: `templates/RESEARCH_BRIEF_TEMPLATE.md`
+- [x] **Document-based pipeline input** — `/idea-discovery` and `/research-pipeline` auto-detect `research/RESEARCH_BRIEF.md` in project root. Detailed context replaces one-line prompt. Template: `templates/RESEARCH_BRIEF_TEMPLATE.md`
 - [ ] **Auto hyperparameter tuning skill** — rewrite [auto-hparam-tuning](https://github.com/zxh0916/auto-hparam-tuning) as an ARIS SKILL.md. 5-step cycle: understand project → plan tuning strategy → run experiments → analyze metrics (TensorBoard/W&B) → learn and iterate. Would plug into Workflow 1.5 (`/experiment-bridge`) or Workflow 2 (`/auto-review-loop`) when reviewer says "tune hyperparameters"
 
 ## 💬 Community

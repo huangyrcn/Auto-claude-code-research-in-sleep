@@ -18,7 +18,7 @@ This skill chains sub-skills into a single automated pipeline:
   (survey)      (brainstorm)    (verify novel)    (critical feedback)  (refine method + plan experiments)
 ```
 
-Each phase builds on the previous one's output. The final deliverables are a validated `IDEA_REPORT.md` with ranked ideas, plus a refined proposal (`refine-logs/FINAL_PROPOSAL.md`) and experiment plan (`refine-logs/EXPERIMENT_PLAN.md`) for the top idea.
+Each phase builds on the previous one's output. The final deliverables are a validated `research/IDEA_REPORT.md` with ranked ideas, plus a refined proposal (`research/refine/FINAL_PROPOSAL.md`) and experiment plan (`research/refine/EXPERIMENT_PLAN.md`) for the top idea.
 
 ## Constants
 
@@ -29,7 +29,7 @@ Each phase builds on the previous one's output. The final deliverables are a val
 - **AUTO_PROCEED = true** — If user doesn't respond at a checkpoint, automatically proceed with the best option after presenting results. Set to `false` to always wait for explicit user confirmation.
 - **REVIEWER_MODEL = `gpt-5.4`** — Model used via Codex MCP. Must be an OpenAI model (e.g., `gpt-5.4`, `o3`, `gpt-4o`). Passed to sub-skills.
 - **ARXIV_DOWNLOAD = false** — When `true`, `/research-lit` downloads the top relevant arXiv PDFs during Phase 1. When `false` (default), only fetches metadata. Passed through to `/research-lit`.
-- **COMPACT = false** — When `true`, generate compact summary files for short-context models and session recovery. Writes `IDEA_CANDIDATES.md` (top 3-5 ideas only) at the end of this workflow. Downstream skills read this instead of the full `IDEA_REPORT.md`.
+- **COMPACT = false** — When `true`, generate compact summary files for short-context models and session recovery. Writes `research/IDEA_CANDIDATES.md` (top 3-5 ideas only) at the end of this workflow. Downstream skills read this instead of the full `research/IDEA_REPORT.md`.
 - **REF_PAPER = false** — Reference paper to base ideas on. Accepts: local PDF path, arXiv URL, or any paper URL. When set, the paper is summarized first (`REF_PAPER_SUMMARY.md`), then idea generation uses it as context. Combine with `base repo` for "improve this paper with this codebase" workflows.
 
 > 💡 These are defaults. Override by telling the skill, e.g., `/idea-discovery "topic" — ref paper: https://arxiv.org/abs/2406.04329` or `/idea-discovery "topic" — compact: true`.
@@ -40,7 +40,7 @@ Each phase builds on the previous one's output. The final deliverables are a val
 
 Before starting any other phase, check for a detailed research brief in the project:
 
-1. Look for `RESEARCH_BRIEF.md` in the project root (or path passed as `$ARGUMENTS`)
+1. Look for `research/RESEARCH_BRIEF.md` in the project root (or path passed as `$ARGUMENTS`)
 2. If found, read it and extract:
    - Problem statement and context
    - Constraints (compute, data, timeline, venue)
@@ -48,11 +48,11 @@ Before starting any other phase, check for a detailed research brief in the proj
    - Domain knowledge and non-goals
    - Existing results (if any)
 3. Use this as the primary context for all subsequent phases — it replaces the one-line prompt
-4. If both `RESEARCH_BRIEF.md` and a one-line `$ARGUMENTS` exist, merge them (brief takes priority for details, argument sets the direction)
+4. If both `research/RESEARCH_BRIEF.md` and a one-line `$ARGUMENTS` exist, merge them (brief takes priority for details, argument sets the direction)
 
 If no brief exists, proceed normally with `$ARGUMENTS` as the research direction.
 
-> 💡 Create a brief from the template: `cp templates/RESEARCH_BRIEF_TEMPLATE.md RESEARCH_BRIEF.md`
+> 💡 Create a brief from the template: `cp templates/RESEARCH_BRIEF_TEMPLATE.md research/RESEARCH_BRIEF.md`
 
 ### Phase 0.5: Reference Paper Summary (when REF_PAPER is set)
 
@@ -64,7 +64,7 @@ Summarize the reference paper before searching the literature:
    - Invoke `/arxiv "ARXIV_ID" — download` to fetch the PDF
    - Read the first 5 pages (title, abstract, intro, method overview)
 
-2. **If local PDF path** (e.g., `papers/reference.pdf`):
+2. **If local PDF path** (e.g., `literature/reference.pdf`):
    - Read the PDF directly (first 5 pages)
 
 3. **If other URL**:
@@ -150,9 +150,9 @@ Invoke `/idea-creator` with the landscape context (and `REF_PAPER_SUMMARY.md` if
 - Deep validate top ideas (full novelty check + devil's advocate)
 - Run parallel pilot experiments on available GPUs (top 2-3 ideas)
 - Rank by empirical signal
-- Output `IDEA_REPORT.md`
+- Output `research/IDEA_REPORT.md`
 
-**🚦 Checkpoint:** Present `IDEA_REPORT.md` ranked ideas to the user. Ask:
+**🚦 Checkpoint:** Present `research/IDEA_REPORT.md` ranked ideas to the user. Ask:
 
 ```
 💡 Generated X ideas, filtered to Y, piloted Z. Top results:
@@ -184,7 +184,7 @@ For each top idea (positive pilot signal), run a thorough novelty check:
 - Check for concurrent work (last 3-6 months)
 - Identify closest existing work and differentiation points
 
-**Update `IDEA_REPORT.md`** with deep novelty results. Eliminate any idea that turns out to be already published.
+**Update `research/IDEA_REPORT.md`** with deep novelty results. Eliminate any idea that turns out to be already published.
 
 ### Phase 4: External Critical Review
 
@@ -199,7 +199,7 @@ For the surviving top idea(s), get brutal feedback:
 - Scores the idea, identifies weaknesses, suggests minimum viable improvements
 - Provides concrete feedback on experimental design
 
-**Update `IDEA_REPORT.md`** with reviewer feedback and revised plan.
+**Update `research/IDEA_REPORT.md`** with reviewer feedback and revised plan.
 
 ### Phase 4.5: Method Refinement + Experiment Planning
 
@@ -213,7 +213,7 @@ After review, refine the top idea into a concrete proposal and plan experiments:
 - Freeze a **Problem Anchor** to prevent scope drift
 - Iteratively refine the method via GPT-5.4 review (up to 5 rounds, until score ≥ 9)
 - Generate a claim-driven experiment roadmap with ablations, budgets, and run order
-- Output: `refine-logs/FINAL_PROPOSAL.md`, `refine-logs/EXPERIMENT_PLAN.md`, `refine-logs/EXPERIMENT_TRACKER.md`
+- Output: `research/refine/FINAL_PROPOSAL.md`, `research/refine/EXPERIMENT_PLAN.md`, `research/refine/EXPERIMENT_TRACKER.md`
 
 **🚦 Checkpoint:** Present the refined proposal summary:
 
@@ -234,7 +234,7 @@ Proceed to implementation? Or adjust the proposal?
 
 ### Phase 5: Final Report
 
-Finalize `IDEA_REPORT.md` with all accumulated information:
+Finalize `research/IDEA_REPORT.md` with all accumulated information:
 
 ```markdown
 # Idea Discovery Report
@@ -265,9 +265,9 @@ Finalize `IDEA_REPORT.md` with all accumulated information:
 [ideas killed at each phase, with reasons]
 
 ## Refined Proposal
-- Proposal: `refine-logs/FINAL_PROPOSAL.md`
-- Experiment plan: `refine-logs/EXPERIMENT_PLAN.md`
-- Tracker: `refine-logs/EXPERIMENT_TRACKER.md`
+- Proposal: `research/refine/FINAL_PROPOSAL.md`
+- Experiment plan: `research/refine/EXPERIMENT_PLAN.md`
+- Tracker: `research/refine/EXPERIMENT_TRACKER.md`
 
 ## Next Steps
 - [ ] /run-experiment to deploy experiments from the plan
@@ -279,7 +279,7 @@ Finalize `IDEA_REPORT.md` with all accumulated information:
 
 **Skip entirely if `COMPACT` is `false`.**
 
-Write `IDEA_CANDIDATES.md` — a lean summary of the top 3-5 surviving ideas:
+Write `research/IDEA_CANDIDATES.md` — a lean summary of the top 3-5 surviving ideas:
 
 ```markdown
 # Idea Candidates
@@ -296,7 +296,7 @@ Write `IDEA_CANDIDATES.md` — a lean summary of the top 3-5 surviving ideas:
 - Next step: /experiment-bridge or /research-refine
 ```
 
-This file is intentionally small (~30 lines) so downstream skills and session recovery can read it without loading the full `IDEA_REPORT.md` (~200+ lines).
+This file is intentionally small (~30 lines) so downstream skills and session recovery can read it without loading the full `research/IDEA_REPORT.md` (~200+ lines).
 
 ## Key Rules
 

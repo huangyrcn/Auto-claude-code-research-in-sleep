@@ -11,7 +11,7 @@ ARIS workflows can run for hours (idea discovery, auto-review loops, overnight t
 1. **Context compaction** — when the context window fills up, Claude Code auto-compresses prior messages. After compaction, the LLM only has a compressed summary and may forget which stage you're in, what experiments are running, or what to do next.
 2. **Proactive new sessions** — LLM capability degrades noticeably when context usage exceeds ~50%. Experienced users proactively start fresh sessions to restore full model capability, rather than waiting for auto-compaction. This means the LLM must reconstruct project state from disk.
 
-ARIS already persists some state to files (`REVIEW_STATE.json`, `AUTO_REVIEW.md`), but **there is no systematic mechanism to ensure the LLM reads those files on recovery**. After compaction, it often doesn't.
+ARIS already persists some state to files (`research/REVIEW_STATE.json`, `research/AUTO_REVIEW.md`), but **there is no systematic mechanism to ensure the LLM reads those files on recovery**. After compaction, it often doesn't.
 
 ## The Core Solution: Pipeline Status
 
@@ -25,7 +25,7 @@ Add this to your project `CLAUDE.md`:
 ## Pipeline Status
 stage: idea-discovery | implementation | training | paper
 idea: "one-line description of the current idea"
-contract: docs/research_contract.md
+contract: research/contract.md
 current_branch: feature/idea-name
 baseline: "representative dataset acc=95.2 (paper reports 95.5)"
 training_status: running on server-X, GPU 0-3, tmux=train01, wandb=run_id,
@@ -40,7 +40,7 @@ next: what to do next
 |-------|---------|---------|
 | `stage` | Which workflow phase you're in | `training` |
 | `idea` | What you're working on | `"factorized attention gap in discrete diffusion LMs"` |
-| `contract` | Pointer to detailed context | `docs/research_contract.md` |
+| `contract` | Pointer to detailed context | `research/contract.md` |
 | `current_branch` | Git branch for this idea | `feature/factorized-gap` |
 | `baseline` | Baseline numbers for comparison | `"WikiText-103 PPL=18.2 (paper 18.5)"` |
 | `training_status` | Overall training state | `running on b2, GPU 0-3, tmux=exp01` |
@@ -60,9 +60,9 @@ The LLM should update Pipeline Status **immediately** when any of these happen:
 
 ### Why You Need a Research Contract
 
-After Workflow 1 (`/idea-discovery`), `IDEA_REPORT.md` contains 8-12 candidate ideas. Once you pick one and move to implementation, keeping all candidates in context wastes the LLM's working memory and degrades its output quality.
+After Workflow 1 (`/idea-discovery`), `research/IDEA_REPORT.md` contains 8-12 candidate ideas. Once you pick one and move to implementation, keeping all candidates in context wastes the LLM's working memory and degrades its output quality.
 
-**`docs/research_contract.md`** solves this by extracting *only the active idea* into a focused working document — claims, experiment design, baselines, and results. New sessions read this instead of the full IDEA_REPORT.md. See [`templates/RESEARCH_CONTRACT_TEMPLATE.md`](../templates/RESEARCH_CONTRACT_TEMPLATE.md) for the template.
+**`research/contract.md`** solves this by extracting *only the active idea* into a focused working document — claims, experiment design, baselines, and results. New sessions read this instead of the full research/IDEA_REPORT.md. See [`templates/RESEARCH_CONTRACT_TEMPLATE.md`](../templates/RESEARCH_CONTRACT_TEMPLATE.md) for the template.
 
 - **Created**: when an idea is selected (Workflow 1 → Workflow 1.5)
 - **Updated**: as baselines are reproduced, experiments complete, decisions are made
@@ -73,7 +73,7 @@ After Workflow 1 (`/idea-discovery`), `IDEA_REPORT.md` contains 8-12 candidate i
 **New session or post-compaction**, the LLM reads in this order:
 
 1. `CLAUDE.md` → `## Pipeline Status` (30-second orientation)
-2. `docs/research_contract.md` (focused context for the active idea — not the full IDEA_REPORT)
+2. `research/contract.md` (focused context for the active idea — not the full IDEA_REPORT)
 3. Project notes or log files, if you maintain any (restore debugging context, decision rationale)
 4. If `active_tasks`/`training_status` is non-empty → check remote sessions, rebuild monitoring
 
@@ -93,7 +93,7 @@ Pipeline Status update triggers:
 
 On new session or post-compaction recovery:
 1. Read ## Pipeline Status
-2. Read docs/research_contract.md (the active idea's focused context)
+2. Read research/contract.md (the active idea's focused context)
 3. Read project notes if any (e.g., experiment logs, decision rationale)
 4. If active_tasks is non-empty → check remote status, rebuild monitoring
 5. Resume work without asking the user
@@ -166,8 +166,8 @@ if [ -n "$STATUS" ]; then
 fi
 
 # 2. Check for research_contract.md
-if [ -f "$PROJECT_DIR/docs/research_contract.md" ]; then
-  OUTPUT="$OUTPUT\n\n[session-restore] docs/research_contract.md exists — read it to restore full idea context."
+if [ -f "$PROJECT_DIR/research/contract.md" ]; then
+  OUTPUT="$OUTPUT\n\n[session-restore] research/contract.md exists — read it to restore full idea context."
 fi
 
 # 3. Check for active training
@@ -175,11 +175,11 @@ if grep -q "training_status:.*running" "$PROJECT_DIR/CLAUDE.md" 2>/dev/null; the
   OUTPUT="$OUTPUT\n\n[session-restore] Active training detected — check remote status and rebuild monitoring."
 fi
 
-# 4. Check for REVIEW_STATE.json (auto-review-loop recovery)
-if [ -f "$PROJECT_DIR/REVIEW_STATE.json" ]; then
-  RS_STATUS=$(python3 -c "import json; d=json.load(open('$PROJECT_DIR/REVIEW_STATE.json')); print(d.get('status',''))" 2>/dev/null)
+# 4. Check for research/REVIEW_STATE.json (auto-review-loop recovery)
+if [ -f "$PROJECT_DIR/research/REVIEW_STATE.json" ]; then
+  RS_STATUS=$(python3 -c "import json; d=json.load(open('$PROJECT_DIR/research/REVIEW_STATE.json')); print(d.get('status',''))" 2>/dev/null)
   if [ "$RS_STATUS" = "in_progress" ]; then
-    OUTPUT="$OUTPUT\n\n[session-restore] REVIEW_STATE.json found (in_progress) — auto-review-loop can resume."
+    OUTPUT="$OUTPUT\n\n[session-restore] research/REVIEW_STATE.json found (in_progress) — auto-review-loop can resume."
   fi
 fi
 
@@ -260,10 +260,10 @@ CWD=$(pwd)
 echo "[pre-compact] Context compaction is about to happen."
 echo "[pre-compact] Before continuing, ensure these are up to date:"
 echo "  1. CLAUDE.md Pipeline Status (stage, idea, active_tasks, next)"
-echo "  2. docs/research_contract.md (current idea context and results)"
+echo "  2. research/contract.md (current idea context and results)"
 echo "  3. EXPERIMENT_TRACKER.md (any unreported results)"
-echo "  4. REVIEW_STATE.json (if running auto-review-loop)"
-echo "[pre-compact] After compaction, read CLAUDE.md and docs/research_contract.md to recover."
+echo "  4. research/REVIEW_STATE.json (if running auto-review-loop)"
+echo "[pre-compact] After compaction, read CLAUDE.md and research/contract.md to recover."
 HOOKEOF
 chmod +x ~/.claude/hooks/pre-compact-remind.sh
 ```
@@ -289,7 +289,7 @@ CWD=$(pwd)
 
 FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
 case "$FILE_PATH" in
-  */CLAUDE.md|*/IDEA_REPORT.md|*/AUTO_REVIEW.md|*/REVIEW_STATE.json|*/EXPERIMENT_TRACKER.md|*/research_contract.md)
+  */CLAUDE.md|*/research/IDEA_REPORT.md|*/research/AUTO_REVIEW.md|*/research/REVIEW_STATE.json|*/EXPERIMENT_TRACKER.md|*/research_contract.md)
     exit 0 ;;
 esac
 

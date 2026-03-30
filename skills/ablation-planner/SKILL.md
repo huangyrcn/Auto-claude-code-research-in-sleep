@@ -22,8 +22,8 @@ Systematically design ablation studies that answer the questions reviewers will 
 ### Step 1: Prepare Context
 
 CC reads available project files to build the full picture:
-- Method description and components (from docs/research_contract.md or project CLAUDE.md)
-- Current experiment results (from EXPERIMENT_LOG.md, EXPERIMENT_TRACKER.md, or W&B)
+- Method description and components (from research/contract.md or project CLAUDE.md)
+- Current experiment results (from research/EXPERIMENT_LOG.md, EXPERIMENT_TRACKER.md, or W&B)
 - Confirmed and intended claims (from result-to-claim output or project notes)
 - Available compute resources (from CLAUDE.md server config, if present)
 
@@ -108,8 +108,8 @@ Before running anything, CC checks:
 1. Create configs/scripts for each ablation (config-only changes first)
 2. Smoke test each ablation before full run
 3. Run in suggested order, using descriptive names (e.g., `ablation-no-module-X`)
-4. Track results in EXPERIMENT_LOG.md
-5. After all ablations complete → update findings.md with insights
+4. Track results in research/EXPERIMENT_LOG.md
+5. After all ablations complete → update research/findings.md with insights
 
 ## Rules
 
@@ -119,4 +119,4 @@ Before running anything, CC checks:
 - If total compute exceeds budget, CC proposes cuts and asks Codex to re-prioritize — don't silently drop ablations.
 - Component ablations (remove/replace) take priority over hyperparameter sweeps.
 - Do not generate ablations for components identical to the baseline (no-op ablations).
-- Record all ablation results in EXPERIMENT_LOG.md, including negative results (component removal had no effect = important finding).
+- Record all ablation results in research/EXPERIMENT_LOG.md, including negative results (component removal had no effect = important finding).

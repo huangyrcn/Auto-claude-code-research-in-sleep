@@ -28,7 +28,7 @@ User input (PROBLEM + vague APPROACH)
   -> Phase 3 (Claude): Anchor check + simplicity check -> revise method -> rewrite full proposal
   -> Phase 4 (Codex, same agent): Re-evaluate revised proposal
   -> Repeat Phase 3-4 until OVERALL SCORE >= 9 or MAX_ROUNDS reached
-  -> Phase 5: Save full history to refine-logs/
+  -> Phase 5: Save full history to research/refine/
   -> Optional handoff: /experiment-plan for a detailed execution-ready experiment roadmap
 ```
 
@@ -37,8 +37,8 @@ User input (PROBLEM + vague APPROACH)
 - **REVIEWER_MODEL = `claude-review`** — Claude reviewer invoked through the local `claude-review` MCP bridge. Set `CLAUDE_REVIEW_MODEL` if you need a specific Claude model override.
 - **MAX_ROUNDS = 5** — Maximum review-revise rounds.
 - **SCORE_THRESHOLD = 9** — Minimum overall score to stop.
-- **OUTPUT_DIR = `refine-logs/`** — Directory for round files and final report.
-- **MAX_LOCAL_PAPERS = 15** — Maximum local papers/notes to scan for grounding.
+- **OUTPUT_DIR = `research/refine/`** — Directory for round files and final report.
+- **MAX_LOCAL_PAPERS = 15** — Maximum local literature/notes to scan for grounding.
 - **MAX_CORE_EXPERIMENTS = 3** — Default cap for core validation blocks inside this skill.
 - **MAX_PRIMARY_CLAIMS = 2** — Soft cap for paper-level claims. Prefer one dominant claim plus one supporting claim.
 - **MAX_NEW_TRAINABLE_COMPONENTS = 2** — Soft cap for genuinely new trainable pieces. Exceed only if the paper breaks otherwise.
@@ -48,7 +48,7 @@ User input (PROBLEM + vague APPROACH)
 ## Output Structure
 
 ```
-refine-logs/
+research/refine/
 ├── round-0-initial-proposal.md
 ├── round-1-review.md
 ├── round-1-refinement.md
@@ -159,7 +159,7 @@ Additional rules:
 
 #### Step 1.6: Write the Initial Proposal
 
-Save to `refine-logs/round-0-initial-proposal.md`.
+Save to `research/refine/round-0-initial-proposal.md`.
 
 Use this structure:
 
@@ -324,7 +324,7 @@ After this start call, immediately save the returned `jobId` and poll `mcp__clau
 
 **CRITICAL: Save the FULL raw response** verbatim.
 
-Save review to `refine-logs/round-1-review.md` with the raw response in a `<details>` block.
+Save review to `research/refine/round-1-review.md` with the raw response in a `<details>` block.
 
 ### Phase 3: Parse Feedback and Revise the Method
 
@@ -346,7 +346,7 @@ Extract:
 - **Modernization Opportunities**
 - **Action items** ranked by priority
 
-Update `refine-logs/score-history.md`:
+Update `research/refine/score-history.md`:
 
 ```markdown
 # Score Evolution
@@ -389,7 +389,7 @@ Bias the revisions toward:
 
 Do **not** add multiple parallel contributions just to chase score. If the reviewer requests another module, first ask whether the same gain can come from a better interface, distillation signal, reward model, or inference policy on top of an existing backbone.
 
-Save to `refine-logs/round-N-refinement.md`:
+Save to `research/refine/round-N-refinement.md`:
 
 ```markdown
 # Round N Refinement
@@ -463,7 +463,7 @@ mcp__claude-review__review_reply_start:
 
 After this start call, immediately save the returned `jobId` and poll `mcp__claude-review__review_status` with a bounded `waitSeconds` until `done=true`. Treat the completed status payload's `response` as the reviewer output, and save the completed `threadId` for any follow-up round.
 
-Save review to `refine-logs/round-N-review.md`.
+Save review to `research/refine/round-N-review.md`.
 
 Then return to Phase 3 until:
 
@@ -472,7 +472,7 @@ Then return to Phase 3 until:
 
 ### Phase 5: Final Report and Logs
 
-#### Step 5.1: Write `refine-logs/REVIEW_SUMMARY.md`
+#### Step 5.1: Write `research/refine/REVIEW_SUMMARY.md`
 
 This file is the high-level round-by-round review record. It should answer: each round was trying to solve what, what changed, what got resolved, and what remained.
 
@@ -511,7 +511,7 @@ This file is the high-level round-by-round review record. It should answer: each
 - Remaining weaknesses:
 ```
 
-#### Step 5.2: Write `refine-logs/FINAL_PROPOSAL.md`
+#### Step 5.2: Write `research/refine/FINAL_PROPOSAL.md`
 
 This file is the clean final version document. It should contain only the final proposal itself, without review chatter, round history, or raw reviewer output.
 
@@ -523,7 +523,7 @@ This file is the clean final version document. It should contain only the final 
 
 If the final verdict is not READY, still write the best current final version here.
 
-#### Step 5.3: Write `refine-logs/REFINEMENT_REPORT.md`
+#### Step 5.3: Write `research/refine/REFINEMENT_REPORT.md`
 
 ```markdown
 # Refinement Report
@@ -539,8 +539,8 @@ If the final verdict is not READY, still write the best current final version he
 [Verbatim anchor used across all rounds]
 
 ## Output Files
-- Review summary: `refine-logs/REVIEW_SUMMARY.md`
-- Final proposal: `refine-logs/FINAL_PROPOSAL.md`
+- Review summary: `research/refine/REVIEW_SUMMARY.md`
+- Final proposal: `research/refine/FINAL_PROPOSAL.md`
 
 ## Score Evolution
 
@@ -556,7 +556,7 @@ If the final verdict is not READY, still write the best current final version he
 | 2     | ...                     | ...              | ...    |
 
 ## Final Proposal Snapshot
-- Canonical clean version lives in `refine-logs/FINAL_PROPOSAL.md`
+- Canonical clean version lives in `research/refine/FINAL_PROPOSAL.md`
 - Summarize the final thesis in 3-5 bullets here
 
 ## Method Evolution Highlights
@@ -616,9 +616,9 @@ Key method upgrades:
 Remaining concerns:
 - [if any]
 
-Review summary: refine-logs/REVIEW_SUMMARY.md
-Full report: refine-logs/REFINEMENT_REPORT.md
-Final proposal: refine-logs/FINAL_PROPOSAL.md
+Review summary: research/refine/REVIEW_SUMMARY.md
+Full report: research/refine/REFINEMENT_REPORT.md
+Final proposal: research/refine/FINAL_PROPOSAL.md
 Suggested next step: /experiment-plan
 ```
 

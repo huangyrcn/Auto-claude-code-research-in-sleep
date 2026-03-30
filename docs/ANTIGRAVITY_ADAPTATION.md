@@ -152,7 +152,7 @@ Antigravity uses `GEMINI.md` (equivalent to Claude Code's `CLAUDE.md`) for proje
 
 - Topic: [your research topic]
 - Target venue: ICLR/NeurIPS/ICML
-- Key files: NARRATIVE_REPORT.md, IDEA_REPORT.md
+- Key files: NARRATIVE_REPORT.md, research/IDEA_REPORT.md
 ```
 
 ## 4. How to Invoke Skills
@@ -210,7 +210,7 @@ Follow these sub-skills in sequence:
 5. Read and execute skills/research-refine-pipeline/SKILL.md — refine method + plan experiments
 ```
 
-> **Tip:** If the context gets long, run each phase as a separate agent task in Antigravity's Manager View. Pass results via files (e.g., `IDEA_REPORT.md`, `refine-logs/FINAL_PROPOSAL.md`).
+> **Tip:** If the context gets long, run each phase as a separate agent task in Antigravity's Manager View. Pass results via files (e.g., `research/IDEA_REPORT.md`, `research/refine/FINAL_PROPOSAL.md`).
 
 ### Workflow 1.5: Experiment Bridge
 
@@ -222,7 +222,7 @@ Follow these sub-skills in sequence:
 **Antigravity equivalent:**
 ```
 Read and execute skills/experiment-bridge/SKILL.md.
-Read refine-logs/EXPERIMENT_PLAN.md and implement the experiments.
+Read research/refine/EXPERIMENT_PLAN.md and implement the experiments.
 Deploy to GPU via skills/run-experiment/SKILL.md.
 ```
 
@@ -269,9 +269,9 @@ For the full pipeline (`/research-pipeline`), leverage Antigravity's **multi-age
 
 | Stage | What to do | Output files |
 |-------|-----------|-------------|
-| 1 | Idea Discovery: `skills/idea-discovery/SKILL.md` + your direction | `IDEA_REPORT.md`, `refine-logs/FINAL_PROPOSAL.md`, `refine-logs/EXPERIMENT_PLAN.md` |
+| 1 | Idea Discovery: `skills/idea-discovery/SKILL.md` + your direction | `research/IDEA_REPORT.md`, `research/refine/FINAL_PROPOSAL.md`, `research/refine/EXPERIMENT_PLAN.md` |
 | 2 | Experiment Bridge: `skills/experiment-bridge/SKILL.md` | Experiment scripts, results |
-| 3 | Auto Review Loop: `skills/auto-review-loop/SKILL.md` | `AUTO_REVIEW.md` |
+| 3 | Auto Review Loop: `skills/auto-review-loop/SKILL.md` | `research/AUTO_REVIEW.md` |
 | 4 | Paper Writing: `skills/paper-writing/SKILL.md` + `NARRATIVE_REPORT.md` | `paper/` directory |
 
 Each stage reads the previous stage's output files, so context carries forward across agent sessions.
@@ -296,18 +296,18 @@ ARIS workflows persist state to files for crash recovery. These work identically
 
 | File | Purpose | Written by |
 |------|---------|----|
-| `REVIEW_STATE.json` | Auto-review loop progress | `auto-review-loop` |
-| `AUTO_REVIEW.md` | Cumulative review log | `auto-review-loop` |
-| `IDEA_REPORT.md` | Ranked ideas with pilot results | `idea-discovery` |
+| `research/REVIEW_STATE.json` | Auto-review loop progress | `auto-review-loop` |
+| `research/AUTO_REVIEW.md` | Cumulative review log | `auto-review-loop` |
+| `research/IDEA_REPORT.md` | Ranked ideas with pilot results | `idea-discovery` |
 | `PAPER_PLAN.md` | Paper outline + claims-evidence matrix | `paper-plan` |
-| `refine-logs/FINAL_PROPOSAL.md` | Refined method proposal | `research-refine` |
-| `refine-logs/EXPERIMENT_PLAN.md` | Experiment roadmap | `experiment-plan` |
-| `refine-logs/EXPERIMENT_TRACKER.md` | Run-by-run execution status | `experiment-plan` |
+| `research/refine/FINAL_PROPOSAL.md` | Refined method proposal | `research-refine` |
+| `research/refine/EXPERIMENT_PLAN.md` | Experiment roadmap | `experiment-plan` |
+| `research/refine/EXPERIMENT_TRACKER.md` | Run-by-run execution status | `experiment-plan` |
 
 If an Antigravity agent session ends mid-workflow, start a new session and reference the state file:
 
 ```
-Read skills/auto-review-loop/SKILL.md, then read REVIEW_STATE.json and AUTO_REVIEW.md.
+Read skills/auto-review-loop/SKILL.md, then read research/REVIEW_STATE.json and research/AUTO_REVIEW.md.
 Resume the auto review loop from the saved state.
 ```
 
@@ -351,8 +351,8 @@ Antigravity includes a built-in browser. Useful for:
 
 ### Artifact System
 Antigravity's artifact system (implementation plans, walkthroughs) maps naturally to ARIS outputs:
-- `IDEA_REPORT.md` → implementation plan artifact
-- `AUTO_REVIEW.md` → walkthrough artifact
+- `research/IDEA_REPORT.md` → implementation plan artifact
+- `research/AUTO_REVIEW.md` → walkthrough artifact
 - `PAPER_PLAN.md` → implementation plan artifact
 
 ### Knowledge Persistence

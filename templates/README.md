@@ -23,7 +23,7 @@ Ready-to-use templates for each ARIS workflow. Copy, fill in your content, and r
 ## Usage
 
 ```bash
-cp templates/EXPERIMENT_PLAN_TEMPLATE.md refine-logs/EXPERIMENT_PLAN.md
+cp templates/EXPERIMENT_PLAN_TEMPLATE.md research/refine/EXPERIMENT_PLAN.md
 # Edit with your content, then:
 /experiment-bridge
 ```

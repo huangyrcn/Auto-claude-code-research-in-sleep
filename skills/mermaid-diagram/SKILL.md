@@ -20,7 +20,7 @@ Generate high-quality Mermaid diagram code based on user requirements, with file
 
 ```bash
 # Create output directory
-mkdir -p figures
+mkdir -p writing/paper/figures
 ```
 
 ### Step 1: Understand Requirements & Select Diagram Type
@@ -402,7 +402,7 @@ figures/
 
 ## Key Rules (MUST FOLLOW)
 
-1. **ALWAYS save files to `figures/` directory** — Never just output code in chat
+1. **ALWAYS save files to `writing/paper/figures/` directory** — Never just output code in chat
 2. **ALWAYS generate BOTH `.mmd` and `.md` files** — They must contain identical Mermaid code
 3. **ALWAYS read the reference documentation** before generating code for a diagram type
 4. **ALWAYS verify syntax** — Run mmdc or manually validate before accepting

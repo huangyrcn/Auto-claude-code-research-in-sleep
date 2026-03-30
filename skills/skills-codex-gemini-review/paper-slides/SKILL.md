@@ -21,17 +21,17 @@ Unlike posters (single page, visual-first), slides tell a **temporal story**: ea
 
 - **VENUE = `NeurIPS`** — Target venue, determines color scheme. Supported: `NeurIPS`, `ICML`, `ICLR`, `AAAI`, `ACL`, `EMNLP`, `CVPR`, `ECCV`, `GENERIC`. Override via argument.
 - **TALK_TYPE = `spotlight`** — Talk format. Options: `oral` (15-20 min), `spotlight` (5-8 min), `poster-talk` (3-5 min), `invited` (30-45 min). Determines slide count and content depth.
-- **TALK_MINUTES = 15** — Talk duration in minutes. Auto-adjusts slide count (~1 slide/minute for oral, ~1.5 slides/minute for spotlight). Override explicitly if needed.
+- **TALK_MINUTES = 15** — Talk duration in minutes. Auto-adjusts slide count (~1 slide/minute for oral, ~1.5 writing/slides/minute for spotlight). Override explicitly if needed.
 - **ASPECT_RATIO = `16:9`** — Slide aspect ratio. Options: `16:9` (default, modern projectors), `4:3` (legacy).
 - **SPEAKER_NOTES = true** — Generate `\note{}` blocks in beamer and corresponding PPTX notes. Set `false` for clean slides without notes.
-- **PAPER_DIR = `paper/`** — Directory containing the compiled paper.
-- **OUTPUT_DIR = `slides/`** — Output directory for all slide files.
+- **PAPER_DIR = `writing/paper/`** — Directory containing the compiled paper.
+- **OUTPUT_DIR = `writing/slides/`** — Output directory for all slide files.
 - **REVIEWER_MODEL = `gemini-review`** — Gemini reviewer invoked through the local `gemini-review` MCP bridge for slide review.
 - **AUTO_PROCEED = false** — At each checkpoint, **always wait for explicit user confirmation**.
 - **COMPILER = `latexmk`** — LaTeX build tool.
 - **ENGINE = `pdflatex`** — LaTeX engine. Use `xelatex` for CJK text.
 
-> 💡 Override: `/paper-slides "paper/" — talk_type: oral, venue: ICML, minutes: 20, aspect: 4:3`
+> 💡 Override: `/paper-slides "writing/paper/" — talk_type: oral, venue: ICML, minutes: 20, aspect: 4:3`
 
 ## Talk Type → Slide Count
 
@@ -56,7 +56,7 @@ Same as `/paper-poster`:
 
 ## State Persistence (Compact Recovery)
 
-Persist state to `slides/SLIDES_STATE.json` after each phase:
+Persist state to `writing/slides/SLIDES_STATE.json` after each phase:
 
 ```json
 {
@@ -88,21 +88,21 @@ Persist state to `slides/SLIDES_STATE.json` after each phase:
    ls $PAPER_DIR/figures/
    ```
 
-3. **Backup existing slides**: if `slides/` exists, copy to `slides-backup-{timestamp}/`
+3. **Backup existing slides**: if `writing/slides/` exists, copy to `writing/slides-backup-{timestamp}/`
 
-4. **Create output directory**: `mkdir -p slides/figures`
+4. **Create output directory**: `mkdir -p writing/slides/figures`
 
 5. **Detect CJK**: if paper contains Chinese/Japanese/Korean, set ENGINE to `xelatex`
 
 6. **Determine slide count**: from TALK_TYPE and TALK_MINUTES using the table above
 
-7. **Check for resume**: read `slides/SLIDES_STATE.json` if it exists
+7. **Check for resume**: read `writing/slides/SLIDES_STATE.json` if it exists
 
 **State**: Write `SLIDES_STATE.json` with `phase: 0`.
 
 ### Phase 1: Content Extraction & Slide Outline
 
-Read `paper/sections/*.tex` and build a slide-by-slide outline.
+Read `writing/paper/sections/*.tex` and build a slide-by-slide outline.
 
 **Slide template by talk type**:
 
@@ -146,11 +146,11 @@ Read `paper/sections/*.tex` and build a slide-by-slide outline.
 **For each slide, specify**:
 - Title (max 8 words)
 - 3-5 bullet points (max 8 words each)
-- Figure reference (if any) from paper/figures/
+- Figure reference (if any) from writing/paper/figures/
 - Speaker note (2-3 sentences of what to say)
 - Time allocation (in seconds)
 
-**Output**: `slides/SLIDE_OUTLINE.md`
+**Output**: `writing/slides/SLIDE_OUTLINE.md`
 
 **🚦 Checkpoint:**
 
@@ -158,7 +158,7 @@ Read `paper/sections/*.tex` and build a slide-by-slide outline.
 📊 Slide outline ready:
 - Talk type: [TALK_TYPE] ([TALK_MINUTES] min)
 - Slide count: [N] slides
-- Figures used: [N] from paper/figures/
+- Figures used: [N] from writing/paper/figures/
 - Time budget: [breakdown]
 
 Slide-by-slide outline:
@@ -175,7 +175,7 @@ Proceed to drafting? Or adjust the outline?
 Options:
 - **"go"** → proceed to Phase 2
 - **adjustments** (e.g., "merge slides 3-4", "add a demo slide", "cut the ablation") → revise
-- **"stop"** → save to `slides/SLIDE_OUTLINE.md`
+- **"stop"** → save to `writing/slides/SLIDE_OUTLINE.md`
 
 **State**: Write `SLIDES_STATE.json` with `phase: 1`.
 
@@ -203,7 +203,7 @@ For each slide in the outline, draft the actual content.
 
 ### Phase 3: Generate Slides LaTeX
 
-Create `slides/main.tex` using beamer.
+Create `writing/slides/main.tex` using beamer.
 
 **Template structure**:
 
@@ -283,8 +283,8 @@ Code: [URL or QR placeholder]
 
 **Symlink figures**:
 ```bash
-ln -sf ../paper/figures/*.pdf slides/figures/ 2>/dev/null
-ln -sf ../paper/figures/*.png slides/figures/ 2>/dev/null
+ln -sf ../writing/paper/figures/*.pdf writing/slides/figures/ 2>/dev/null
+ln -sf ../writing/paper/figures/*.png writing/slides/figures/ 2>/dev/null
 ```
 
 **Key formatting rules**:
@@ -309,7 +309,7 @@ cd slides && latexmk -$ENGINE -interaction=nonstopmode main.tex
 **Verification**:
 ```bash
 # Check slide count matches outline
-pdfinfo slides/main.pdf | grep Pages
+pdfinfo writing/slides/main.pdf | grep Pages
 ```
 
 If page count differs significantly from outline (>2 slides off), investigate.
@@ -353,7 +353,7 @@ Apply fixes. Recompile if LaTeX was changed.
 
 > ⚠️ If `gemini-review` MCP is not available or Gemini credentials are missing, skip external review and proceed to Phase 6. Note the skip in `SLIDES_STATE.json`.
 
-Save review to `slides/SLIDES_REVIEW.md`.
+Save review to `writing/slides/SLIDES_REVIEW.md`.
 
 **State**: Write `SLIDES_STATE.json` with `phase: 5`.
 
@@ -365,7 +365,7 @@ For each slide, ensure a `\note{}` block exists with:
 2. **Timing hint** (e.g., "spend 1 minute here", "quick — 20 seconds")
 3. **Transition phrase** to the next slide (e.g., "So how do we actually implement this? Let me show you...")
 
-Also generate `slides/speaker_notes.md` as a standalone backup:
+Also generate `writing/slides/speaker_notes.md` as a standalone backup:
 
 ```markdown
 # Speaker Notes
@@ -395,14 +395,14 @@ Generate an editable PPTX using `python-pptx`:
 python3 -c "import pptx" 2>/dev/null || pip install python-pptx
 ```
 
-Write `slides/generate_pptx.py` that:
+Write `writing/slides/generate_pptx.py` that:
 
 1. Creates a PPTX with correct aspect ratio (16:9 → 13.33" x 7.5"; 4:3 → 10" x 7.5")
 2. For each beamer frame:
    - Creates a slide with matching layout
    - Title in venue primary color, bold
    - Bullet points with venue accent color markers
-   - Figures embedded as images (from slides/figures/)
+   - Figures embedded as images (from writing/slides/figures/)
    - Speaker notes transferred to PPTX notes field
 3. Title slide with special formatting (centered, larger title)
 4. Thank You slide with centered text
@@ -410,7 +410,7 @@ Write `slides/generate_pptx.py` that:
 
 ```bash
 cd slides && python3 generate_pptx.py
-# Output: slides/presentation.pptx
+# Output: writing/slides/presentation.pptx
 ```
 
 > ⚠️ If `python-pptx` is not installed, skip with a note: "Install `pip install python-pptx` to enable PowerPoint export."
@@ -419,7 +419,7 @@ cd slides && python3 generate_pptx.py
 
 ### Phase 8: Full Talk Script
 
-Generate `slides/TALK_SCRIPT.md` — a complete, word-for-word script for the talk.
+Generate `writing/slides/TALK_SCRIPT.md` — a complete, word-for-word script for the talk.
 
 This is different from speaker notes (brief reminders). The talk script is a **full manuscript** that can be read aloud or used for practice.
 
@@ -521,7 +521,7 @@ The paper and code are available at the QR code on screen. I'm happy to take que
 📊 Slide generation complete:
 - Talk type: [TALK_TYPE] ([TALK_MINUTES] min) for [VENUE]
 - Files:
-  slides/
+  writing/slides/
   ├── main.tex              # Beamer LaTeX source
   ├── main.pdf              # Compiled slides (primary output)
   ├── presentation.pptx     # Editable PowerPoint
@@ -531,7 +531,7 @@ The paper and code are available at the QR code on screen. I'm happy to take que
   ├── TALK_SCRIPT.md        # Full word-for-word talk script + Q&A
   ├── SLIDES_STATE.json     # State persistence
   ├── generate_pptx.py      # PPTX generation script
-  └── figures/              # Symlinked from paper/figures/
+  └── figures/              # Symlinked from writing/paper/figures/
 
 Next steps:
 1. Practice with TALK_SCRIPT.md (read aloud, time yourself)
@@ -546,7 +546,7 @@ Next steps:
 
 - **Large file handling**: If the Write tool fails due to file size, immediately retry using Bash (`cat << 'EOF' > file`) to write in chunks. Do NOT ask the user for permission — just do it silently.
 - **One message per slide.** If a slide has two ideas, split it into two slides.
-- **Do NOT fabricate data.** All numbers must come from `paper/sections/*.tex`.
+- **Do NOT fabricate data.** All numbers must come from `writing/paper/sections/*.tex`.
 - **Bullet points only** — never full sentences on slides. Sentence fragments are fine.
 - **Figure slides: figure ≥60% of slide area.** The figure IS the content.
 - **Progressive disclosure**: Use `\pause` or `\onslide` for complex method slides.
@@ -559,7 +559,7 @@ Next steps:
 ## Parameter Pass-Through
 
 ```
-/paper-slides "paper/" — talk_type: oral, venue: ICML, minutes: 20, aspect: 4:3, notes: false
+/paper-slides "writing/paper/" — talk_type: oral, venue: ICML, minutes: 20, aspect: 4:3, notes: false
 ```
 
 | Parameter | Default | Description |

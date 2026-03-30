@@ -37,7 +37,7 @@ Grant proposals argue for **future work** (feasibility + potential), not complet
 - **REVIEWER_MODEL = `gemini-review`** — Gemini reviewer invoked through the local `gemini-review` MCP bridge for proposal review. Set `GEMINI_REVIEW_MODEL` if you need a specific Gemini model override.
 - **OUTPUT_FORMAT = `markdown`** — Output format. Supported: `markdown`, `latex`. LaTeX uses grant-specific templates when available.
 - **MAX_REVIEW_ROUNDS = 2** — Maximum external review-revise cycles before finalizing.
-- **OUTPUT_DIR = `grant-proposal/`** — Directory for generated proposal files.
+- **OUTPUT_DIR = `writing/grant-proposal/`** — Directory for generated proposal files.
 - **LANGUAGE = `auto`** — Output language. Auto-detected from grant type: KAKENHI→Japanese, NSF→English, NSFC→Chinese, ERC→English, DFG→English (or German), SNSF→English, ARC→English, NWO→English. Override explicitly if needed.
 - **AUTO_PROCEED = false** — At each checkpoint, **always wait for explicit user confirmation** before proceeding. Grant proposals require PI-specific judgment at every stage. Set `true` only if user explicitly requests fully autonomous mode.
 
@@ -163,10 +163,10 @@ Parse `$ARGUMENTS` to extract:
 
 Then gather context from the project directory:
 
-1. Read `IDEA_REPORT.md` if it exists (from `/idea-discovery`)
-2. Read `refine-logs/FINAL_PROPOSAL.md` if it exists (from `/research-refine`)
-3. Read `refine-logs/EXPERIMENT_PLAN.md` if it exists (from `/experiment-plan`)
-4. Read `AUTO_REVIEW.md` if it exists (from `/auto-review-loop` — prior review feedback is gold for grants)
+1. Read `research/IDEA_REPORT.md` if it exists (from `/idea-discovery`)
+2. Read `research/refine/FINAL_PROPOSAL.md` if it exists (from `/research-refine`)
+3. Read `research/refine/EXPERIMENT_PLAN.md` if it exists (from `/experiment-plan`)
+4. Read `research/AUTO_REVIEW.md` if it exists (from `/auto-review-loop` — prior review feedback is gold for grants)
 5. Read `NARRATIVE_REPORT.md` or `STORY.md` if they exist
 6. Read any existing literature notes or survey documents
 7. Scan for the user's publication list (e.g., `publications.md`, `cv.md`, `bio.md`, `CV.pdf`)
@@ -176,7 +176,7 @@ If insufficient context exists:
 - No research idea at all → suggest running `/idea-discovery` first
 - No literature survey → will invoke `/research-lit` inline in Phase 1
 - No publication list → leave PI qualification section with `[TODO: Add publications]` placeholders
-- Has AUTO_REVIEW.md → extract reviewer feedback and use it to strengthen the feasibility narrative
+- Has research/AUTO_REVIEW.md → extract reviewer feedback and use it to strengthen the feasibility narrative
 
 ### Phase 1: Literature & Landscape Positioning
 
@@ -327,7 +327,7 @@ Draft each section according to the grant type template. Write **complete prose*
 
 **What this does:**
 - Writes all required sections in the agency-specific language and tone
-- Pulls content from IDEA_REPORT.md, FINAL_PROPOSAL.md, and literature notes
+- Pulls content from research/IDEA_REPORT.md, FINAL_PROPOSAL.md, and literature notes
 - Uses `/paper-illustration` for figure generation (if user requests)
 - Leaves `[TODO]` only for PI-specific information, `[AMOUNT]` for budget figures
 - Outputs `grant-proposal/GRANT_PROPOSAL.md`
@@ -345,7 +345,7 @@ Draft each section according to the grant type template. Write **complete prose*
 
 #### Figure Generation
 
-Grant proposals benefit greatly from clear diagrams. Generate the following figures using SVG or matplotlib (save to `grant-proposal/figures/`):
+Grant proposals benefit greatly from clear diagrams. Generate the following figures using SVG or matplotlib (save to `writing/grant-proposal/figures/`):
 
 1. **全体構成図 / Overview Diagram** — Show the relationship between aims (Aim 1 → Aim 2 → Aim 3), shared resources (participants, stimuli, pipeline), and outputs. This is the single most important figure.
 2. **実験パラダイム図 / Experimental Paradigm** — Visual schematic of each paradigm (stimulus timing, conditions, EEG recording).
@@ -404,7 +404,7 @@ Which should I generate? (e.g., "1 and 3", "all", "skip")
 
 #### For Each Section
 
-1. **Pull relevant content** from IDEA_REPORT.md, FINAL_PROPOSAL.md, literature notes
+1. **Pull relevant content** from research/IDEA_REPORT.md, FINAL_PROPOSAL.md, literature notes
 2. **Write complete prose** — no `[TODO]` except for PI-specific information
 3. **Include figure/table placeholders** where appropriate (e.g., `[Figure 1: System architecture]`)
 4. **Cite references properly** — use citation keys, will build bibliography later

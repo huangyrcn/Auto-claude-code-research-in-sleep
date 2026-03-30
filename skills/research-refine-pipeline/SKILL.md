@@ -33,19 +33,19 @@ Do not plan a large experiment suite on top of an unstable method. First stabili
 
 ## Default Outputs
 
-- `refine-logs/FINAL_PROPOSAL.md`
-- `refine-logs/REVIEW_SUMMARY.md`
-- `refine-logs/REFINEMENT_REPORT.md`
-- `refine-logs/EXPERIMENT_PLAN.md`
-- `refine-logs/EXPERIMENT_TRACKER.md`
-- `refine-logs/PIPELINE_SUMMARY.md`
+- `research/refine/FINAL_PROPOSAL.md`
+- `research/refine/REVIEW_SUMMARY.md`
+- `research/refine/REFINEMENT_REPORT.md`
+- `research/refine/EXPERIMENT_PLAN.md`
+- `research/refine/EXPERIMENT_TRACKER.md`
+- `research/refine/PIPELINE_SUMMARY.md`
 
 ## Workflow
 
 ### Phase 0: Triage the Starting Point
 
 - Extract the problem, rough approach, constraints, resources, and target venue.
-- Check whether `refine-logs/FINAL_PROPOSAL.md` already exists and still matches the current request.
+- Check whether `research/refine/FINAL_PROPOSAL.md` already exists and still matches the current request.
 - If the proposal is missing, stale, or materially different from the current request, run the full `research-refine` stage.
 - If the proposal is already strong and aligned, reuse it and jump to experiment planning.
 - If in doubt, prefer re-running `research-refine` rather than planning experiments for the wrong method.
@@ -85,9 +85,9 @@ If these answers are not crisp, tighten the final proposal first.
 
 Run the `experiment-plan` workflow grounded in:
 
-- `refine-logs/FINAL_PROPOSAL.md`
-- `refine-logs/REVIEW_SUMMARY.md`
-- `refine-logs/REFINEMENT_REPORT.md`
+- `research/refine/FINAL_PROPOSAL.md`
+- `research/refine/REVIEW_SUMMARY.md`
+- `research/refine/REFINEMENT_REPORT.md`
 
 Ensure the experiment plan covers:
 
@@ -99,7 +99,7 @@ Ensure the experiment plan covers:
 
 ### Phase 4: Integration Summary
 
-Write `refine-logs/PIPELINE_SUMMARY.md`:
+Write `research/refine/PIPELINE_SUMMARY.md`:
 
 ```markdown
 # Pipeline Summary
@@ -110,10 +110,10 @@ Write `refine-logs/PIPELINE_SUMMARY.md`:
 **Date**: [today]
 
 ## Final Deliverables
-- Proposal: `refine-logs/FINAL_PROPOSAL.md`
-- Review summary: `refine-logs/REVIEW_SUMMARY.md`
-- Experiment plan: `refine-logs/EXPERIMENT_PLAN.md`
-- Experiment tracker: `refine-logs/EXPERIMENT_TRACKER.md`
+- Proposal: `research/refine/FINAL_PROPOSAL.md`
+- Review summary: `research/refine/REVIEW_SUMMARY.md`
+- Experiment plan: `research/refine/EXPERIMENT_PLAN.md`
+- Experiment tracker: `research/refine/EXPERIMENT_TRACKER.md`
 
 ## Contribution Snapshot
 - Dominant contribution:
@@ -143,14 +143,14 @@ Write `refine-logs/PIPELINE_SUMMARY.md`:
 Pipeline complete.
 
 Method output:
-- refine-logs/FINAL_PROPOSAL.md
+- research/refine/FINAL_PROPOSAL.md
 
 Experiment output:
-- refine-logs/EXPERIMENT_PLAN.md
-- refine-logs/EXPERIMENT_TRACKER.md
+- research/refine/EXPERIMENT_PLAN.md
+- research/refine/EXPERIMENT_TRACKER.md
 
 Pipeline summary:
-- refine-logs/PIPELINE_SUMMARY.md
+- research/refine/PIPELINE_SUMMARY.md
 
 Best next step:
 - /run-experiment

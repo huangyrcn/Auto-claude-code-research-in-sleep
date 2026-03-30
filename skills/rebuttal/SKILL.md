@@ -46,7 +46,7 @@ Workflow 4:   rebuttal (post-submission external reviews)
 - **MAX_FOLLOWUP_ROUNDS = 3** — per reviewer thread.
 - **AUTO_EXPERIMENT = false** — When `true`, automatically invoke `/experiment-bridge` to run supplementary experiments when the strategy plan identifies reviewer concerns that require new empirical evidence. When `false` (default), pause and present the evidence gap to the user for manual handling.
 - **QUICK_MODE = false** — When `true`, only run Phase 0-3 (parse reviews, atomize concerns, build strategy). Outputs `ISSUE_BOARD.md` + `STRATEGY_PLAN.md` and stops — no drafting, no stress test. Useful for quickly understanding what reviewers want before deciding how to respond.
-- **REBUTTAL_DIR = `rebuttal/`**
+- **REBUTTAL_DIR = `writing/rebuttal/`**
 
 > Override: `/rebuttal "paper/" — venue: NeurIPS, character limit: 5000`
 
@@ -71,20 +71,20 @@ Three hard gates — if any fails, do NOT finalize:
 
 ### Phase 0: Resume or Initialize
 
-1. If `rebuttal/REBUTTAL_STATE.md` exists → resume from recorded phase
-2. Otherwise → create `rebuttal/`, initialize all output documents
+1. If `writing/rebuttal/REBUTTAL_STATE.md` exists → resume from recorded phase
+2. Otherwise → create `writing/rebuttal/`, initialize all output documents
 3. Load paper, reviews, venue rules, any user-confirmed evidence
 
 ### Phase 1: Validate Inputs and Normalize Reviews
 
 1. Validate venue rules are explicit
-2. Normalize all reviewer text into `rebuttal/REVIEWS_RAW.md` (verbatim)
-3. Record metadata in `rebuttal/REBUTTAL_STATE.md`
+2. Normalize all reviewer text into `writing/rebuttal/REVIEWS_RAW.md` (verbatim)
+3. Record metadata in `writing/rebuttal/REBUTTAL_STATE.md`
 4. If ambiguous, pause and ask
 
 ### Phase 2: Atomize and Classify Reviewer Concerns
 
-Create `rebuttal/ISSUE_BOARD.md`.
+Create `writing/rebuttal/ISSUE_BOARD.md`.
 
 For each atomic concern:
 - `issue_id` (e.g., R1-C2)
@@ -97,7 +97,7 @@ For each atomic concern:
 
 ### Phase 3: Build Strategy Plan
 
-Create `rebuttal/STRATEGY_PLAN.md`.
+Create `writing/rebuttal/STRATEGY_PLAN.md`.
 
 1. Identify 2-4 **global themes** resolving shared concerns
 2. Choose **response mode** per issue
@@ -120,7 +120,7 @@ If the strategy plan identifies issues that require new empirical evidence (tagg
 
 2. Invoke `/experiment-bridge` with the mini plan:
    ```
-   /experiment-bridge "rebuttal/REBUTTAL_EXPERIMENT_PLAN.md"
+   /experiment-bridge "writing/rebuttal/REBUTTAL_EXPERIMENT_PLAN.md"
    ```
 
 3. Wait for results, then update `ISSUE_BOARD.md`:
@@ -131,13 +131,13 @@ If the strategy plan identifies issues that require new empirical evidence (tagg
    - Switch response mode to `narrow_concession` or `future_work_boundary`
    - Do NOT fabricate positive results
 
-5. Save experiment results to `rebuttal/REBUTTAL_EXPERIMENTS.md` for provenance tracking.
+5. Save experiment results to `writing/rebuttal/REBUTTAL_EXPERIMENTS.md` for provenance tracking.
 
 **Time guard**: If estimated GPU-hours exceed rebuttal deadline, skip and flag for manual handling.
 
 ### Phase 4: Draft Initial Rebuttal
 
-Create `rebuttal/REBUTTAL_DRAFT_v1.md`.
+Create `writing/rebuttal/REBUTTAL_DRAFT_v1.md`.
 
 Structure:
 1. **Short opener** — thank reviewers + 2-4 global resolutions
@@ -163,7 +163,7 @@ Hard rules:
 - NEVER promise what user hasn't approved
 - If no strong evidence exists, say less not more
 
-Also generate `rebuttal/PASTE_READY.txt` (plain text, exact character count).
+Also generate `writing/rebuttal/PASTE_READY.txt` (plain text, exact character count).
 
 ### Phase 5: Safety Validation
 
@@ -194,24 +194,24 @@ mcp__codex__codex:
     Verdict: safe to submit / needs revision
 ```
 
-Save full response to `rebuttal/MCP_STRESS_TEST.md`. If hard safety blocker → revise before finalizing.
+Save full response to `writing/rebuttal/MCP_STRESS_TEST.md`. If hard safety blocker → revise before finalizing.
 
 ### Phase 7: Finalize — Two Versions
 
 Produce **two outputs** for different purposes:
 
-1. **`rebuttal/PASTE_READY.txt`** — the strict version
+1. **`writing/rebuttal/PASTE_READY.txt`** — the strict version
    - Plain text, exact character count, fits venue limit
    - Ready to paste directly into OpenReview / CMT / HotCRP
    - No markdown formatting, no extras
 
-2. **`rebuttal/REBUTTAL_DRAFT_rich.md`** — the extended version
+2. **`writing/rebuttal/REBUTTAL_DRAFT_rich.md`** — the extended version
    - Same structure but with **more detail**: fuller explanations, additional evidence, optional paragraphs
    - Marked with `[OPTIONAL — cut if over limit]` for sections that exceed the strict version
    - Author can read this to understand the full reasoning, then manually decide what to keep/cut/rewrite
    - Useful for follow-up rounds — the extra material is pre-written
 
-3. Update `rebuttal/REBUTTAL_STATE.md`
+3. Update `writing/rebuttal/REBUTTAL_STATE.md`
 4. Present to user:
    - `PASTE_READY.txt` character count vs venue limit
    - `REBUTTAL_DRAFT_rich.md` for review and manual editing
@@ -221,7 +221,7 @@ Produce **two outputs** for different purposes:
 
 When new reviewer comments arrive:
 
-1. Append verbatim to `rebuttal/FOLLOWUP_LOG.md`
+1. Append verbatim to `writing/rebuttal/FOLLOWUP_LOG.md`
 2. Link to existing issues or create new ones
 3. Draft **delta reply only** (not full rewrite)
 4. Re-run safety lints

@@ -67,7 +67,7 @@ Generate publication-quality illustrations using a **multi-stage workflow** with
 - **REASONING_MODEL = `gemini-3-pro-preview`** — Gemini for layout optimization and style checking
 - **MAX_ITERATIONS = 5** — Maximum refinement rounds
 - **TARGET_SCORE = 9** — Minimum acceptable score (1-10) — RAISED FOR QUALITY
-- **OUTPUT_DIR = `figures/ai_generated/`** — Output directory
+- **OUTPUT_DIR = `writing/paper/figures/ai_generated/`** — Output directory
 - **API_KEY_ENV = `GEMINI_API_KEY`** — Environment variable
 
 ## CVPR/ICLR/NeurIPS Top-Tier Conference Style Guide
@@ -165,7 +165,7 @@ if [ -z "$GEMINI_API_KEY" ]; then
 fi
 
 # Create output directory
-mkdir -p figures/ai_generated
+mkdir -p writing/paper/figures/ai_generated
 ```
 
 ### Step 1: Codex Plans the Figure (YOU ARE HERE)
@@ -343,7 +343,7 @@ API_KEY="${GEMINI_API_KEY}"
 URL="https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent?key=$API_KEY"
 
 # Read layout from previous step
-LAYOUT=$(cat figures/ai_generated/layout_description.txt)
+LAYOUT=$(cat writing/paper/figures/ai_generated/layout_description.txt)
 
 # Style verification request
 STYLE_REQUEST="You are a CVPR/NeurIPS paper figure reviewer specializing in visual standards.
@@ -391,7 +391,7 @@ except:
 
 echo "=== Style Verification Complete ==="
 echo "$STYLE_SPEC"
-echo "$STYLE_SPEC" > "figures/ai_generated/style_spec.txt"
+echo "$STYLE_SPEC" > "writing/paper/figures/ai_generated/style_spec.txt"
 ```
 
 ### Step 4: Paperbanana Image Rendering (gemini-3-pro-image-preview)
@@ -413,7 +413,7 @@ API_KEY="${GEMINI_API_KEY}"
 URL="https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent?key=$API_KEY"
 
 # Read the style-enhanced specification from previous step
-STYLE_SPEC=$(cat figures/ai_generated/style_spec.txt)
+STYLE_SPEC=$(cat writing/paper/figures/ai_generated/style_spec.txt)
 
 # Add rendering instructions
 RENDER_PROMPT="Render a publication-quality academic diagram based on this specification:
@@ -644,7 +644,7 @@ When figure is accepted (score ≥ 9):
 % === AI-Generated Figure ===
 \begin{figure*}[t]
     \centering
-    \includegraphics[width=0.95\textwidth]{figures/ai_generated/figure_final.png}
+    \includegraphics[width=0.95\textwidth]{writing/paper/figures/ai_generated/figure_final.png}
     \caption{[Caption based on user's original request].}
     \label{fig:[label]}
 \end{figure*}
@@ -668,7 +668,7 @@ When figure is accepted (score ≥ 9):
 ## Output Structure
 
 ```
-figures/ai_generated/
+writing/paper/figures/ai_generated/
 ├── layout_description.txt  # Step 2: Gemini layout optimization output
 ├── style_spec.txt          # Step 3: Gemini style verification output
 ├── figure_v1.png           # Iteration 1 (Paperbanana render)

@@ -17,7 +17,7 @@ Generate high-quality Mermaid diagram code based on user requirements, with file
 ### Step 0: Pre-flight Check
 
 ```bash
-mkdir -p figures
+mkdir -p writing/paper/figures
 ```
 
 ### Step 1: Understand Requirements & Select Diagram Type

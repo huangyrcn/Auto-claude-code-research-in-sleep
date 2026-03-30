@@ -60,7 +60,7 @@ Analyze the task, find the best GPU, and present cost-optimized options. This is
 
 Read available context to determine what the task needs:
 
-1. **From the experiment plan** (`refine-logs/EXPERIMENT_PLAN.md`):
+1. **From the experiment plan** (`research/refine/EXPERIMENT_PLAN.md`):
    - Compute budget (total GPU-hours)
    - Hardware hints (e.g., "4x RTX 3090")
    - Model architecture and dataset size

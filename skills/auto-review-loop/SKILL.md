@@ -15,16 +15,16 @@ Autonomously iterate: review → implement fixes → re-review, until the extern
 
 - MAX_ROUNDS = 4
 - POSITIVE_THRESHOLD: score >= 6/10, or verdict contains "accept", "sufficient", "ready for submission"
-- REVIEW_DOC: `AUTO_REVIEW.md` in project root (cumulative log)
+- REVIEW_DOC: `research/AUTO_REVIEW.md` in project root (cumulative log)
 - REVIEWER_MODEL = `gpt-5.4` — Model used via Codex MCP. Must be an OpenAI model (e.g., `gpt-5.4`, `o3`, `gpt-4o`)
 - **HUMAN_CHECKPOINT = false** — When `true`, pause after each round's review (Phase B) and present the score + weaknesses to the user. Wait for user input before proceeding to Phase C. The user can: approve the suggested fixes, provide custom modification instructions, skip specific fixes, or stop the loop early. When `false` (default), the loop runs fully autonomously.
-- **COMPACT = false** — When `true`, (1) read `EXPERIMENT_LOG.md` and `findings.md` instead of parsing full logs on session recovery, (2) append key findings to `findings.md` after each round.
+- **COMPACT = false** — When `true`, (1) read `research/EXPERIMENT_LOG.md` and `research/findings.md` instead of parsing full logs on session recovery, (2) append key findings to `research/findings.md` after each round.
 
 > 💡 Override: `/auto-review-loop "topic" — compact: true, human checkpoint: true`
 
 ## State Persistence (Compact Recovery)
 
-Long-running loops may hit the context window limit, triggering automatic compaction. To survive this, persist state to `REVIEW_STATE.json` after each round:
+Long-running loops may hit the context window limit, triggering automatic compaction. To survive this, persist state to `research/REVIEW_STATE.json` after each round:
 
 ```json
 {
@@ -46,21 +46,21 @@ Long-running loops may hit the context window limit, triggering automatic compac
 
 ### Initialization
 
-1. **Check for `REVIEW_STATE.json`** in project root:
+1. **Check for `research/REVIEW_STATE.json`** in project root:
    - If it does not exist: **fresh start** (normal case, identical to behavior before this feature existed)
    - If it exists AND `status` is `"completed"`: **fresh start** (previous loop finished normally)
    - If it exists AND `status` is `"in_progress"` AND `timestamp` is older than 24 hours: **fresh start** (stale state from a killed/abandoned run — delete the file and start over)
    - If it exists AND `status` is `"in_progress"` AND `timestamp` is within 24 hours: **resume**
      - Read the state file to recover `round`, `threadId`, `last_score`, `pending_experiments`
-     - Read `AUTO_REVIEW.md` to restore full context of prior rounds
+     - Read `research/AUTO_REVIEW.md` to restore full context of prior rounds
      - If `pending_experiments` is non-empty, check if they have completed (e.g., check screen sessions)
      - Resume from the next round (round = saved round + 1)
      - Log: "Recovered from context compaction. Resuming at Round N."
-2. Read project narrative documents, memory files, and any prior review documents. **When `COMPACT = true` and compact files exist**: read `findings.md` + `EXPERIMENT_LOG.md` instead of full `AUTO_REVIEW.md` and raw logs — saves context window.
+2. Read project narrative documents, memory files, and any prior review documents. **When `COMPACT = true` and compact files exist**: read `research/findings.md` + `research/EXPERIMENT_LOG.md` instead of full `research/AUTO_REVIEW.md` and raw logs — saves context window.
 3. Read recent experiment results (check output directories, logs)
 4. Identify current weaknesses and open TODOs from prior reviews
 5. Initialize round counter = 1 (unless recovered from state file)
-6. Create/update `AUTO_REVIEW.md` with header and timestamp
+6. Create/update `research/AUTO_REVIEW.md` with header and timestamp
 
 ### Loop (repeat up to MAX_ROUNDS)
 
@@ -164,7 +164,7 @@ If experiments were launched:
 
 #### Phase E: Document Round
 
-Append to `AUTO_REVIEW.md`:
+Append to `research/AUTO_REVIEW.md`:
 
 ```markdown
 ## Round N (timestamp)
@@ -194,9 +194,9 @@ This is the authoritative record. Do NOT truncate or paraphrase.]
 - [continuing to round N+1 / stopping]
 ```
 
-**Write `REVIEW_STATE.json`** with current round, threadId, score, verdict, and any pending experiments.
+**Write `research/REVIEW_STATE.json`** with current round, threadId, score, verdict, and any pending experiments.
 
-**Append to `findings.md`** (when `COMPACT = true`): one-line entry per key finding this round:
+**Append to `research/findings.md`** (when `COMPACT = true`): one-line entry per key finding this round:
 
 ```markdown
 - [Round N] [positive/negative/unexpected]: [one-sentence finding] (metric: X.XX → Y.YY)
@@ -208,11 +208,11 @@ Increment round counter → back to Phase A.
 
 When loop ends (positive assessment or max rounds):
 
-1. Update `REVIEW_STATE.json` with `"status": "completed"`
-2. Write final summary to `AUTO_REVIEW.md`
+1. Update `research/REVIEW_STATE.json` with `"status": "completed"`
+2. Write final summary to `research/AUTO_REVIEW.md`
 3. Update project notes with conclusions
-4. **Write method/pipeline description** to `AUTO_REVIEW.md` under a `## Method Description` section — a concise 1-2 paragraph description of the final method, its architecture, and data flow. This serves as input for `/paper-illustration` in Workflow 3 (so it can generate architecture diagrams automatically).
-5. **Generate claims from results** — invoke `/result-to-claim` to convert experiment results from `AUTO_REVIEW.md` into structured paper claims. Output: `CLAIMS_FROM_RESULTS.md`. This bridges Workflow 2 → Workflow 3 so `/paper-plan` can directly use validated claims instead of extracting them from scratch. If `/result-to-claim` is not available, skip silently.
+4. **Write method/pipeline description** to `research/AUTO_REVIEW.md` under a `## Method Description` section — a concise 1-2 paragraph description of the final method, its architecture, and data flow. This serves as input for `/paper-illustration` in Workflow 3 (so it can generate architecture diagrams automatically).
+5. **Generate claims from results** — invoke `/result-to-claim` to convert experiment results from `research/AUTO_REVIEW.md` into structured paper claims. Output: `CLAIMS_FROM_RESULTS.md`. This bridges Workflow 2 → Workflow 3 so `/paper-plan` can directly use validated claims instead of extracting them from scratch. If `/result-to-claim` is not available, skip silently.
 6. If stopped at max rounds without positive assessment:
    - List remaining blockers
    - Estimate effort needed for each

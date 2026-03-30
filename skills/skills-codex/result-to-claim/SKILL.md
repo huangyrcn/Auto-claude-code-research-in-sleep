@@ -27,10 +27,10 @@ Experiments produce numbers; this gate decides what those numbers *mean*. Collec
 Gather experiment data from whatever sources are available in the project:
 
 1. **W&B** (preferred): `wandb.Api().run("<entity>/<project>/<run_id>").history()` - metrics, training curves, comparisons
-2. **`EXPERIMENT_LOG.md`** - full results table with baselines and verdicts
+2. **`research/EXPERIMENT_LOG.md`** - full results table with baselines and verdicts
 3. **`EXPERIMENT_TRACKER.md`** - check which experiments are done vs still running
 4. **Log files** - `ssh server "tail -100 /path/to/training.log"` if no other source
-5. **`docs/research_contract.md`** or project notes - intended claims and experiment design
+5. **`research/contract.md`** or project notes - intended claims and experiment design
 
 Assemble the key information:
 
@@ -99,19 +99,19 @@ Extract structured fields from the response:
 
 #### `no` - Claim not supported
 
-1. Record a postmortem in `findings.md`:
+1. Record a postmortem in `research/findings.md`:
    - What was tested, what failed, and hypotheses for why
    - Constraints for future attempts (what **not** to try again)
 2. Update the project pipeline status in project notes
-3. Decide whether to pivot to the next idea from `IDEA_CANDIDATES.md` or try an alternative approach
+3. Decide whether to pivot to the next idea from `research/IDEA_CANDIDATES.md` or try an alternative approach
 
 #### `partial` - Claim partially supported
 
 1. Update the working claim to reflect what **is** supported
-2. Record the gap in `findings.md`
+2. Record the gap in `research/findings.md`
 3. Design and run supplementary experiments to fill evidence gaps
 4. Re-run `/result-to-claim` after supplementary experiments complete
-5. If the same claim gets multiple `partial` verdicts, record the analysis in `findings.md` and consider narrowing the claim scope or switching ideas
+5. If the same claim gets multiple `partial` verdicts, record the analysis in `research/findings.md` and consider narrowing the claim scope or switching ideas
 
 #### `yes` - Claim supported
 
@@ -126,4 +126,4 @@ Extract structured fields from the response:
 - A single positive result on one dataset does not support a general claim. Be honest about scope.
 - If `confidence` is low, treat the judgment as inconclusive and add experiments rather than committing to a claim.
 - If reviewer delegation is unavailable, make the best local judgment you can and mark it `[pending external review]`.
-- Always record the verdict and reasoning in `findings.md`, regardless of outcome.
+- Always record the verdict and reasoning in `research/findings.md`, regardless of outcome.

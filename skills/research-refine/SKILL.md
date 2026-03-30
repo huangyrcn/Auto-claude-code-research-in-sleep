@@ -27,7 +27,7 @@ User input (PROBLEM + vague APPROACH)
   -> Phase 3 (Claude): Anchor check + simplicity check -> revise method -> rewrite full proposal
   -> Phase 4 (Codex, same thread): Re-evaluate revised proposal
   -> Repeat Phase 3-4 until OVERALL SCORE >= 9 or MAX_ROUNDS reached
-  -> Phase 5: Save full history to refine-logs/
+  -> Phase 5: Save full history to research/refine/
   -> Optional handoff: /experiment-plan for a detailed execution-ready experiment roadmap
 ```
 
@@ -36,8 +36,8 @@ User input (PROBLEM + vague APPROACH)
 - **REVIEWER_MODEL = `gpt-5.4`** — Reviewer model used via Codex MCP.
 - **MAX_ROUNDS = 5** — Maximum review-revise rounds.
 - **SCORE_THRESHOLD = 9** — Minimum overall score to stop.
-- **OUTPUT_DIR = `refine-logs/`** — Directory for round files and final report.
-- **MAX_LOCAL_PAPERS = 15** — Maximum local papers/notes to scan for grounding.
+- **OUTPUT_DIR = `research/refine/`** — Directory for round files and final report.
+- **MAX_LOCAL_PAPERS = 15** — Maximum local literature/notes to scan for grounding.
 - **MAX_CORE_EXPERIMENTS = 3** — Default cap for core validation blocks inside this skill.
 - **MAX_PRIMARY_CLAIMS = 2** — Soft cap for paper-level claims. Prefer one dominant claim plus one supporting claim.
 - **MAX_NEW_TRAINABLE_COMPONENTS = 2** — Soft cap for genuinely new trainable pieces. Exceed only if the paper breaks otherwise.
@@ -46,7 +46,7 @@ User input (PROBLEM + vague APPROACH)
 
 ## State Persistence (Checkpoint Recovery)
 
-Long-running refinement sessions may fail mid-way (e.g., API timeout, context compaction, or session interruption). To avoid losing completed work, persist state to `refine-logs/REFINE_STATE.json` after each phase boundary:
+Long-running refinement sessions may fail mid-way (e.g., API timeout, context compaction, or session interruption). To avoid losing completed work, persist state to `research/refine/REFINE_STATE.json` after each phase boundary:
 
 ```json
 {
@@ -79,7 +79,7 @@ Long-running refinement sessions may fail mid-way (e.g., API timeout, context co
 ## Output Structure
 
 ```
-refine-logs/
+research/refine/
 ├── REFINE_STATE.json
 ├── round-0-initial-proposal.md
 ├── round-1-review.md
@@ -101,15 +101,15 @@ Every `round-N-refinement.md` must contain a **full anchored proposal**, not jus
 
 Before starting any phase, check whether a previous run left a checkpoint:
 
-1. **Check for `refine-logs/REFINE_STATE.json`**:
+1. **Check for `research/refine/REFINE_STATE.json`**:
    - If it **does not exist** → **fresh start** (proceed to Phase 0 normally)
    - If it exists AND `status` is `"completed"` → **fresh start** (delete state file, previous run finished)
    - If it exists AND `status` is `"in_progress"` AND `timestamp` is **older than 24 hours** → **fresh start** (stale state from a killed/abandoned run — delete the file)
    - If it exists AND `status` is `"in_progress"` AND `timestamp` is **within 24 hours** → **resume**
 
 2. **On resume**, read the state file and recover context:
-   - Read all existing `refine-logs/round-*.md` files to restore prior work
-   - Read `refine-logs/score-history.md` if it exists
+   - Read all existing `research/refine/round-*.md` files to restore prior work
+   - Read `research/refine/score-history.md` if it exists
    - Recover `threadId` for reviewer thread continuity
    - Log to the user: `"Checkpoint found. Resuming after phase: {phase}, round: {round}."`
    - **Jump to the next phase** based on the saved `phase` value:
@@ -121,7 +121,7 @@ Before starting any phase, check whether a previous run left a checkpoint:
    | `"review"` | Phase 2 or 4 done | Phase 3 (read latest `round-N-review.md`) |
    | `"refine"` | Phase 3 done | Phase 4 (read latest `round-N-refinement.md`) |
 
-3. **On fresh start**, ensure `refine-logs/` directory exists and proceed to Phase 0.
+3. **On fresh start**, ensure `research/refine/` directory exists and proceed to Phase 0.
 
 ### Phase 0: Freeze the Problem Anchor
 
@@ -137,7 +137,7 @@ Write:
 
 If later reviewer feedback would change the problem being solved, mark that as **drift** and push back or adapt carefully.
 
-**Checkpoint:** Write `refine-logs/REFINE_STATE.json` with `{"phase": "anchor", "round": 0, "threadId": null, "last_score": null, "last_verdict": null, "status": "in_progress", "timestamp": "<now>"}`.
+**Checkpoint:** Write `research/refine/REFINE_STATE.json` with `{"phase": "anchor", "round": 0, "threadId": null, "last_score": null, "last_verdict": null, "status": "in_progress", "timestamp": "<now>"}`.
 
 ### Phase 1: Build the Initial Proposal
 
@@ -219,7 +219,7 @@ Additional rules:
 
 #### Step 1.6: Write the Initial Proposal
 
-Save to `refine-logs/round-0-initial-proposal.md`.
+Save to `research/refine/round-0-initial-proposal.md`.
 
 Use this structure:
 
@@ -311,7 +311,7 @@ Use this structure:
 - Timeline:
 ```
 
-**Checkpoint:** Update `refine-logs/REFINE_STATE.json` with `{"phase": "proposal", "round": 0, ...}`.
+**Checkpoint:** Update `research/refine/REFINE_STATE.json` with `{"phase": "proposal", "round": 0, ...}`.
 
 ### Phase 2: External Method Review (Round 1)
 
@@ -386,9 +386,9 @@ mcp__codex__codex:
 
 **CRITICAL: Save the FULL raw response** verbatim.
 
-Save review to `refine-logs/round-1-review.md` with the raw response in a `<details>` block.
+Save review to `research/refine/round-1-review.md` with the raw response in a `<details>` block.
 
-**Checkpoint:** Update `refine-logs/REFINE_STATE.json` with `{"phase": "review", "round": 1, "threadId": "<saved>", "last_score": <parsed>, "last_verdict": "<parsed>", ...}`.
+**Checkpoint:** Update `research/refine/REFINE_STATE.json` with `{"phase": "review", "round": 1, "threadId": "<saved>", "last_score": <parsed>, "last_verdict": "<parsed>", ...}`.
 
 ### Phase 3: Parse Feedback and Revise the Method
 
@@ -410,7 +410,7 @@ Extract:
 - **Modernization Opportunities**
 - **Action items** ranked by priority
 
-Update `refine-logs/score-history.md`:
+Update `research/refine/score-history.md`:
 
 ```markdown
 # Score Evolution
@@ -453,7 +453,7 @@ Bias the revisions toward:
 
 Do **not** add multiple parallel contributions just to chase score. If the reviewer requests another module, first ask whether the same gain can come from a better interface, distillation signal, reward model, or inference policy on top of an existing backbone.
 
-Save to `refine-logs/round-N-refinement.md`:
+Save to `research/refine/round-N-refinement.md`:
 
 ```markdown
 # Round N Refinement
@@ -490,7 +490,7 @@ Save to `refine-logs/round-N-refinement.md`:
 [Full updated proposal from Problem Anchor through Claim-Driven Validation Sketch]
 ```
 
-**Checkpoint:** Update `refine-logs/REFINE_STATE.json` with `{"phase": "refine", "round": N, ...}`.
+**Checkpoint:** Update `research/refine/REFINE_STATE.json` with `{"phase": "refine", "round": N, ...}`.
 
 ### Phase 4: Re-evaluation (Round 2+)
 
@@ -529,9 +529,9 @@ mcp__codex__codex-reply:
     Same output format: 7 scores, overall score, verdict, drift warning, simplification opportunities, modernization opportunities, remaining action items.
 ```
 
-Save review to `refine-logs/round-N-review.md`.
+Save review to `research/refine/round-N-review.md`.
 
-**Checkpoint:** Update `refine-logs/REFINE_STATE.json` with `{"phase": "review", "round": N, "threadId": "<saved>", "last_score": <parsed>, "last_verdict": "<parsed>", ...}`.
+**Checkpoint:** Update `research/refine/REFINE_STATE.json` with `{"phase": "review", "round": N, "threadId": "<saved>", "last_score": <parsed>, "last_verdict": "<parsed>", ...}`.
 
 Then return to Phase 3 until:
 
@@ -540,7 +540,7 @@ Then return to Phase 3 until:
 
 ### Phase 5: Final Report and Logs
 
-#### Step 5.1: Write `refine-logs/REVIEW_SUMMARY.md`
+#### Step 5.1: Write `research/refine/REVIEW_SUMMARY.md`
 
 This file is the high-level round-by-round review record. It should answer: each round was trying to solve what, what changed, what got resolved, and what remained.
 
@@ -579,7 +579,7 @@ This file is the high-level round-by-round review record. It should answer: each
 - Remaining weaknesses:
 ```
 
-#### Step 5.2: Write `refine-logs/FINAL_PROPOSAL.md`
+#### Step 5.2: Write `research/refine/FINAL_PROPOSAL.md`
 
 This file is the clean final version document. It should contain only the final proposal itself, without review chatter, round history, or raw reviewer output.
 
@@ -591,7 +591,7 @@ This file is the clean final version document. It should contain only the final 
 
 If the final verdict is not READY, still write the best current final version here.
 
-#### Step 5.3: Write `refine-logs/REFINEMENT_REPORT.md`
+#### Step 5.3: Write `research/refine/REFINEMENT_REPORT.md`
 
 ```markdown
 # Refinement Report
@@ -607,8 +607,8 @@ If the final verdict is not READY, still write the best current final version he
 [Verbatim anchor used across all rounds]
 
 ## Output Files
-- Review summary: `refine-logs/REVIEW_SUMMARY.md`
-- Final proposal: `refine-logs/FINAL_PROPOSAL.md`
+- Review summary: `research/refine/REVIEW_SUMMARY.md`
+- Final proposal: `research/refine/FINAL_PROPOSAL.md`
 
 ## Score Evolution
 
@@ -624,7 +624,7 @@ If the final verdict is not READY, still write the best current final version he
 | 2     | ...                     | ...              | ...    |
 
 ## Final Proposal Snapshot
-- Canonical clean version lives in `refine-logs/FINAL_PROPOSAL.md`
+- Canonical clean version lives in `research/refine/FINAL_PROPOSAL.md`
 - Summarize the final thesis in 3-5 bullets here
 
 ## Method Evolution Highlights
@@ -684,13 +684,13 @@ Key method upgrades:
 Remaining concerns:
 - [if any]
 
-Review summary: refine-logs/REVIEW_SUMMARY.md
-Full report: refine-logs/REFINEMENT_REPORT.md
-Final proposal: refine-logs/FINAL_PROPOSAL.md
+Review summary: research/refine/REVIEW_SUMMARY.md
+Full report: research/refine/REFINEMENT_REPORT.md
+Final proposal: research/refine/FINAL_PROPOSAL.md
 Suggested next step: /experiment-plan
 ```
 
-**Checkpoint:** Update `refine-logs/REFINE_STATE.json` with `{"phase": "done", "status": "completed", ...}`.
+**Checkpoint:** Update `research/refine/REFINE_STATE.json` with `{"phase": "done", "status": "completed", ...}`.
 
 ## Key Rules
 

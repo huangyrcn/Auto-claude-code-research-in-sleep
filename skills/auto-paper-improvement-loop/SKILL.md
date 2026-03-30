@@ -22,11 +22,11 @@ Unlike `/auto-review-loop` (which iterates on **research** — running experimen
 - **REVIEW_LOG = `PAPER_IMPROVEMENT_LOG.md`** — Cumulative log of all rounds, stored in paper directory.
 - **HUMAN_CHECKPOINT = false** — When `true`, pause after each round's review and present score + weaknesses to the user. The user can approve fixes, provide custom modification instructions, skip specific fixes, or stop early. When `false` (default), runs fully autonomously.
 
-> 💡 Override: `/auto-paper-improvement-loop "paper/" — human checkpoint: true`
+> 💡 Override: `/auto-paper-improvement-loop "writing/paper/" — human checkpoint: true`
 
 ## Inputs
 
-1. **Compiled paper** — `paper/main.pdf` + LaTeX source files
+1. **Compiled paper** — `writing/paper/main.pdf` + LaTeX source files
 2. **All section `.tex` files** — concatenated for review prompt
 
 ## State Persistence (Compact Recovery)
@@ -52,7 +52,7 @@ If the context window fills up mid-loop, Claude Code auto-compacts. To recover, 
 ### Step 0: Preserve Original
 
 ```bash
-cp paper/main.pdf paper/main_round0_original.pdf
+cp writing/paper/main.pdf writing/paper/main_round0_original.pdf
 ```
 
 ### Step 1: Collect Paper Text
@@ -61,7 +61,7 @@ Concatenate all section files into a single text block for the review prompt:
 
 ```bash
 # Collect all sections in order
-for f in paper/sections/*.tex; do
+for f in writing/paper/sections/*.tex; do
     echo "% === $(basename $f) ==="
     cat "$f"
 done > /tmp/paper_full_text.txt
@@ -193,20 +193,20 @@ After the final recompilation, run a format compliance check:
 
 ```bash
 # 1. Page count vs venue limit
-PAGES=$(pdfinfo paper/main.pdf | grep Pages | awk '{print $2}')
+PAGES=$(pdfinfo writing/paper/main.pdf | grep Pages | awk '{print $2}')
 echo "Pages: $PAGES (limit: 9 main body for ICLR/NeurIPS)"
 
 # 2. Overfull hbox warnings (content exceeding margins)
-OVERFULL=$(grep -c "Overfull" paper/main.log 2>/dev/null || echo 0)
+OVERFULL=$(grep -c "Overfull" writing/paper/main.log 2>/dev/null || echo 0)
 echo "Overfull hbox warnings: $OVERFULL"
-grep "Overfull" paper/main.log 2>/dev/null | head -10
+grep "Overfull" writing/paper/main.log 2>/dev/null | head -10
 
 # 3. Underfull hbox warnings (loose spacing)
-UNDERFULL=$(grep -c "Underfull" paper/main.log 2>/dev/null || echo 0)
+UNDERFULL=$(grep -c "Underfull" writing/paper/main.log 2>/dev/null || echo 0)
 echo "Underfull hbox warnings: $UNDERFULL"
 
 # 4. Bad boxes summary
-grep -c "badness" paper/main.log 2>/dev/null || echo "0 badness warnings"
+grep -c "badness" writing/paper/main.log 2>/dev/null || echo "0 badness warnings"
 ```
 
 **Auto-fix patterns:**

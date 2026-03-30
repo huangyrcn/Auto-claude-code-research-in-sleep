@@ -13,9 +13,9 @@ This skill bridges Workflow 1 (idea discovery + method refinement) and Workflow 
 
 ```
 Workflow 1 output:                    This skill:                        Workflow 2 input:
-refine-logs/EXPERIMENT_PLAN.md   →   implement → deploy → collect   →   initial results ready
-refine-logs/EXPERIMENT_TRACKER.md     code        /run-experiment        for /auto-review-loop
-refine-logs/FINAL_PROPOSAL.md
+research/refine/EXPERIMENT_PLAN.md   →   implement → deploy → collect   →   initial results ready
+research/refine/EXPERIMENT_TRACKER.md     code        /run-experiment        for /auto-review-loop
+research/refine/FINAL_PROPOSAL.md
 ```
 
 ## Constants
@@ -24,7 +24,7 @@ refine-logs/FINAL_PROPOSAL.md
 - **SANITY_FIRST = true** — Run the sanity-stage experiment first (smallest, fastest) before launching the rest. Catches setup bugs early.
 - **MAX_PARALLEL_RUNS = 4** — Maximum number of experiments to deploy in parallel (limited by available GPUs).
 - **BASE_REPO = false** — GitHub repo URL to use as a base codebase. When set, clone it first and implement experiments on top of it.
-- **COMPACT = false** — When `true`, prefer `IDEA_CANDIDATES.md` over the full `IDEA_REPORT.md`, and append completed runs to `EXPERIMENT_LOG.md`.
+- **COMPACT = false** — When `true`, prefer `research/IDEA_CANDIDATES.md` over the full `research/IDEA_REPORT.md`, and append completed runs to `research/EXPERIMENT_LOG.md`.
 
 > Override: `/experiment-bridge "EXPERIMENT_PLAN.md" — compact: true, base repo: https://github.com/org/project`
 
@@ -32,11 +32,11 @@ refine-logs/FINAL_PROPOSAL.md
 
 This skill expects one or more of:
 
-1. **`refine-logs/EXPERIMENT_PLAN.md`** (best) — claim-driven experiment roadmap from `/experiment-plan`
-2. **`refine-logs/EXPERIMENT_TRACKER.md`** — run-by-run execution table
-3. **`refine-logs/FINAL_PROPOSAL.md`** — method description for implementation context
-4. **`IDEA_CANDIDATES.md`** — compact idea summary (preferred when `COMPACT = true`)
-5. **`IDEA_REPORT.md`** — fallback if refine-logs don't exist
+1. **`research/refine/EXPERIMENT_PLAN.md`** (best) — claim-driven experiment roadmap from `/experiment-plan`
+2. **`research/refine/EXPERIMENT_TRACKER.md`** — run-by-run execution table
+3. **`research/refine/FINAL_PROPOSAL.md`** — method description for implementation context
+4. **`research/IDEA_CANDIDATES.md`** — compact idea summary (preferred when `COMPACT = true`)
+5. **`research/IDEA_REPORT.md`** — fallback if refine-logs don't exist
 
 If none exist, ask the user what experiments to implement.
 
@@ -149,7 +149,7 @@ As experiments complete:
 
 1. **Parse output files** (JSON/CSV/logs) for key metrics
 2. **Training quality check** — if W&B data is available, invoke `/training-check` to detect NaN, loss divergence, plateaus, or overfitting. If W&B is not configured, skip silently.
-3. **Update `refine-logs/EXPERIMENT_TRACKER.md`** — fill in Status and Notes columns
+3. **Update `research/refine/EXPERIMENT_TRACKER.md`** — fill in Status and Notes columns
 4. **Check success criteria** from EXPERIMENT_PLAN.md — did each experiment meet its bar?
 5. **Write initial results summary:**
 
@@ -157,7 +157,7 @@ As experiments complete:
 # Initial Experiment Results
 
 **Date**: [today]
-**Plan**: refine-logs/EXPERIMENT_PLAN.md
+**Plan**: research/refine/EXPERIMENT_PLAN.md
 
 ## Results by Milestone
 
@@ -190,7 +190,7 @@ As experiments complete:
 
 **Skip entirely if `COMPACT` is `false`.**
 
-Append each completed experiment to `EXPERIMENT_LOG.md`:
+Append each completed experiment to `research/EXPERIMENT_LOG.md`:
 
 ```markdown
 ## [Run ID] — [timestamp]
@@ -207,7 +207,7 @@ After main experiments (M2) complete with positive results, invoke `/ablation-pl
 
 - Read the main results and method description
 - Generate a claim-driven ablation plan: which components to remove, what to compare, and expected outcomes
-- Append ablation blocks to `refine-logs/EXPERIMENT_PLAN.md` and `refine-logs/EXPERIMENT_TRACKER.md`
+- Append ablation blocks to `research/refine/EXPERIMENT_PLAN.md` and `research/refine/EXPERIMENT_TRACKER.md`
 - If main results are negative or inconclusive, skip ablation planning and note that in the summary
 
 If `/ablation-planner` is unavailable, skip silently.
@@ -223,8 +223,8 @@ Present final status:
 - Completed: [X/Y] must-run, [A/B] nice-to-have
 - Main result: [one sentence]
 
-Results: refine-logs/EXPERIMENT_RESULTS.md
-Tracker: refine-logs/EXPERIMENT_TRACKER.md
+Results: research/refine/EXPERIMENT_RESULTS.md
+Tracker: research/refine/EXPERIMENT_TRACKER.md
 
 Ready for Workflow 2:
 → /auto-review-loop "[topic]"

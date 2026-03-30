@@ -18,7 +18,7 @@ Generate all figures and tables for a paper based on: **$ARGUMENTS**
 | **Generated image grids** | ❌ No — manual | Grids of generated samples (e.g., GAN/diffusion outputs). These come from running your model, not from this skill |
 | **Photographs / screenshots** | ❌ No — manual | Real-world images, UI screenshots, qualitative examples |
 
-**In practice:** For a typical ML paper, this skill handles ~60% of figures (all data plots + tables). The remaining ~40% (hero figure, architecture diagram, qualitative results) need to be created manually and placed in `figures/` before running `/paper-write`. The skill will detect these as "existing figures" and preserve them.
+**In practice:** For a typical ML paper, this skill handles ~60% of figures (all data plots + tables). The remaining ~40% (hero figure, architecture diagram, qualitative results) need to be created manually and placed in `writing/paper/figures/` before running `/paper-write`. The skill will detect these as "existing figures" and preserve them.
 
 ## Constants
 
@@ -27,13 +27,13 @@ Generate all figures and tables for a paper based on: **$ARGUMENTS**
 - **FORMAT = `pdf`** — Output format. Options: `pdf` (vector, best for LaTeX), `png` (raster fallback)
 - **COLOR_PALETTE = `tab10`** — Default matplotlib color cycle. Options: `tab10`, `Set2`, `colorblind` (deuteranopia-safe)
 - **FONT_SIZE = 10** — Base font size (matches typical conference body text)
-- **FIG_DIR = `figures/`** — Output directory for generated figures
+- **FIG_DIR = `writing/paper/figures/`** — Output directory for generated paper figures
 - **REVIEWER_MODEL = `gpt-5.4`** — Model used via a secondary Codex agent for figure quality review.
 
 ## Inputs
 
 1. **PAPER_PLAN.md** — figure plan table (from `/paper-plan`)
-2. **Experiment data** — JSON files, CSV files, or screen logs in `figures/` or project root
+2. **Experiment data** — JSON files, CSV files, or screen logs in `writing/paper/figures/` or project root
 3. **Existing figures** — any manually created figures to preserve
 
 If no PAPER_PLAN.md exists, scan for data files and ask the user which figures to generate.
@@ -193,7 +193,7 @@ For each figure, output the LaTeX code to include it:
 \end{figure}
 ```
 
-Save all snippets to `figures/latex_includes.tex` for easy copy-paste into the paper.
+Save all snippets to `writing/paper/figures/latex_includes.tex` for easy copy-paste into the paper.
 
 ### Step 7: Figure Quality Review with REVIEWER_MODEL
 

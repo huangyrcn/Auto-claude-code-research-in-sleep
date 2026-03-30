@@ -12,7 +12,7 @@ Compile the LaTeX paper and fix any issues: **$ARGUMENTS**
 - **COMPILER = `latexmk`** — LaTeX build tool. Handles multi-pass compilation automatically.
 - **ENGINE = `pdflatex`** — LaTeX engine. Options: `pdflatex` (default), `xelatex` (for CJK/custom fonts), `lualatex`.
 - **MAX_COMPILE_ATTEMPTS = 3** — Maximum attempts to fix errors and recompile.
-- **PAPER_DIR = `paper/`** — Directory containing LaTeX source files.
+- **PAPER_DIR = `writing/paper/`** — Directory containing LaTeX source files.
 - **MAX_PAGES** — Page limit. ML conferences: main body to Conclusion end (excluding references & appendix). ICLR=9, NeurIPS=9, ICML=8. **IEEE venues: references ARE included in page count.** IEEE journal ≈ 12-14 pages, IEEE conference ≈ 5-8 pages (all inclusive).
 
 ## Workflow
@@ -188,9 +188,9 @@ Check for orphaned section files not referenced by `main.tex`:
 
 ```bash
 # Find all .tex files in sections/ and check which are \input'ed by main.tex
-for f in paper/sections/*.tex; do
+for f in writing/paper/sections/*.tex; do
     base=$(basename "$f")
-    if ! grep -q "$base" paper/main.tex; then
+    if ! grep -q "$base" writing/paper/main.tex; then
         echo "WARNING: $f is not referenced by main.tex — consider removing"
     fi
 done
@@ -218,7 +218,7 @@ For conference submission, additional checks:
 ## Compilation Report
 
 - **Status**: SUCCESS / FAILED
-- **PDF**: paper/main.pdf
+- **PDF**: writing/paper/main.pdf
 - **Pages**: X (main body to Conclusion) + Y (references) + Z (appendix)
 - **Within page limit**: YES/NO (MAX_PAGES = N)
 - **Errors fixed**: [list of auto-fixed issues]

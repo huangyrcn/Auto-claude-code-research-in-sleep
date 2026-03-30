@@ -24,10 +24,10 @@ Experiments produce numbers; this gate decides what those numbers *mean*. Collec
 Gather experiment data from whatever sources are available in the project:
 
 1. **W&B** (preferred): `wandb.Api().run("<entity>/<project>/<run_id>").history()` — metrics, training curves, comparisons
-2. **EXPERIMENT_LOG.md**: full results table with baselines and verdicts
+2. **research/EXPERIMENT_LOG.md**: full results table with baselines and verdicts
 3. **EXPERIMENT_TRACKER.md**: check which experiments are DONE vs still running
 4. **Log files**: `ssh server "tail -100 /path/to/training.log"` if no other source
-5. **docs/research_contract.md**: intended claims and experiment design
+5. **research/contract.md**: intended claims and experiment design
 
 Assemble the key information:
 - What experiments were run (method, dataset, config)
@@ -92,19 +92,19 @@ Extract structured fields from Codex response:
 
 #### `no` — Claim not supported
 
-1. Record postmortem in findings.md (Research Findings section):
+1. Record postmortem in research/findings.md (Research Findings section):
    - What was tested, what failed, hypotheses for why
    - Constraints for future attempts (what NOT to try again)
 2. Update CLAUDE.md Pipeline Status
-3. Decide whether to pivot to next idea from IDEA_CANDIDATES.md or try an alternative approach
+3. Decide whether to pivot to next idea from research/IDEA_CANDIDATES.md or try an alternative approach
 
 #### `partial` — Claim partially supported
 
 1. Update the working claim to reflect what IS supported
-2. Record the gap in findings.md
+2. Record the gap in research/findings.md
 3. Design and run supplementary experiments to fill evidence gaps
 4. Re-run result-to-claim after supplementary experiments complete
-5. **Multiple rounds of `partial` on the same claim** → record analysis in findings.md, consider whether to narrow the claim scope or switch ideas
+5. **Multiple rounds of `partial` on the same claim** → record analysis in research/findings.md, consider whether to narrow the claim scope or switch ideas
 
 #### `yes` — Claim supported
 
@@ -119,4 +119,4 @@ Extract structured fields from Codex response:
 - A single positive result on one dataset does not support a general claim. Be honest about scope.
 - If `confidence` is low, treat the judgment as inconclusive and add experiments rather than committing to a claim.
 - If Codex MCP is unavailable (call fails), CC makes its own judgment and marks it `[pending Codex review]` — do not block the pipeline.
-- Always record the verdict and reasoning in findings.md, regardless of outcome.
+- Always record the verdict and reasoning in research/findings.md, regardless of outcome.

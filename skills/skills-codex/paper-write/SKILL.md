@@ -19,8 +19,8 @@ Draft a LaTeX paper based on: **$ARGUMENTS**
 
 1. **PAPER_PLAN.md** — outline with claims-evidence matrix, section plan, figure plan (from `/paper-plan`)
 2. **NARRATIVE_REPORT.md** — the research narrative (primary source of content)
-3. **Generated figures** — PDF/PNG files in `figures/` (from `/paper-figure`)
-4. **LaTeX includes** — `figures/latex_includes.tex` (from `/paper-figure`)
+3. **Generated figures** — PDF/PNG files in `writing/paper/figures/` (from `/paper-figure`)
+4. **LaTeX includes** — `writing/paper/figures/latex_includes.tex` (from `/paper-figure`)
 5. **Bibliography** — existing `.bib` file, or will create one
 
 If no PAPER_PLAN.md exists, ask the user to run `/paper-plan` first or provide a brief outline.
@@ -102,13 +102,13 @@ paper/
 
 ### Step 0: Backup and Clean
 
-If `paper/` already exists, back up to `paper-backup-{timestamp}/` before overwriting. Never silently destroy existing work.
+If `writing/paper/` already exists, back up to `writing/paper-backup-{timestamp}/` before overwriting. Never silently destroy existing work.
 
 **CRITICAL: Clean stale files.** When changing section structure (e.g., 5 sections → 7 sections), delete section files that are no longer referenced by `main.tex`. Stale files (e.g., old `5_conclusion.tex` left behind when conclusion moved to `7_conclusion.tex`) cause confusion and waste space.
 
 ### Step 1: Initialize Project
 
-1. Create `paper/` directory
+1. Create `writing/paper/` directory
 2. Copy venue template from `templates/` — the template already includes:
    - All standard packages (amsmath, hyperref, cleveref, booktabs, etc.)
    - Theorem environments with `\crefname{assumption}` fix
@@ -141,7 +141,7 @@ Process sections in order. For each section:
 1. **Read the plan** — what claims, evidence, citations belong here
 2. **Read NARRATIVE_REPORT.md** — extract relevant content, findings, and quantitative results
 3. **Draft content** — write complete LaTeX (not placeholders)
-4. **Insert figures/tables** — use snippets from `figures/latex_includes.tex`
+4. **Insert figures/tables** — use snippets from `writing/paper/figures/latex_includes.tex`
 5. **Add citations** — for ML conferences (ICLR/NeurIPS/ICML/CVPR/ACL/AAAI): use `\citep{}` / `\citet{}` (natbib). **For IEEE venues**: use `\cite{}` (numeric style via `cite` package). Never mix natbib and cite commands.
 
 Before drafting the front matter, re-read the one-sentence contribution from `PAPER_PLAN.md`. The Abstract and Introduction should make that takeaway obvious before the reader reaches the full method.
@@ -352,7 +352,7 @@ Before declaring done:
 - **Page limit rules differ by venue** — ML conferences: main body to Conclusion, references/appendix NOT counted. **IEEE: references ARE counted toward the page limit.**
 - **Clean bib** — references.bib must only contain entries that are actually `\cite`d
 - **Section count is flexible** — match PAPER_PLAN structure, don't force into 5 sections
-- **Backup before overwrite** — never destroy existing `paper/` directory without backing up
+- **Backup before overwrite** — never destroy existing `writing/paper/` directory without backing up
 - **Front-load the contribution** — do not hide the payoff until the experiments or appendix
 
 ## Writing Quality Reference

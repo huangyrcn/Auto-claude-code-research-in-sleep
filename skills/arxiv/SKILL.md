@@ -156,7 +156,7 @@ After each download:
 
 - Confirm file size > 10 KB (reject smaller files - likely an error HTML page)
 - Add a 1-second delay between consecutive downloads to avoid rate limiting
-- Report: `Downloaded: papers/2301.07041.pdf (842 KB)`
+- Report: `Downloaded: literature/2301.07041.pdf (842 KB)`
 
 ### Step 5: Summarize
 
@@ -182,7 +182,7 @@ For each paper (downloaded or fetched by API):
 Summarize what was done:
 
 - `Found N papers for "query"`
-- `Downloaded: papers/2301.07041.pdf (842 KB)` (for each download)
+- `Downloaded: literature/2301.07041.pdf (842 KB)` (for each download)
 - Any warnings (rate limit hit, file too small, already exists)
 
 Suggest follow-up skills:

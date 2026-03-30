@@ -16,7 +16,7 @@ This skill chains five sub-skills into a single automated pipeline:
   (outline)     (plots)        (LaTeX)        (build PDF)       (review & polish ×2)
 ```
 
-Each phase builds on the previous one's output. The final deliverable is a polished, reviewed `paper/` directory with LaTeX source and compiled PDF.
+Each phase builds on the previous one's output. The final deliverable is a polished, reviewed `writing/paper/` directory with LaTeX source and compiled PDF.
 
 ## Constants
 
@@ -86,10 +86,10 @@ Invoke `/paper-figure` to generate data-driven plots and tables:
 - Read figure plan from PAPER_PLAN.md
 - Generate matplotlib/seaborn plots from JSON/CSV data
 - Generate LaTeX comparison tables
-- Create `figures/latex_includes.tex` for easy insertion
+- Create `writing/paper/figures/latex_includes.tex` for easy insertion
 - GPT-5.4 reviews figure quality and captions
 
-**Output:** `figures/` directory with PDFs, generation scripts, and LaTeX snippets.
+**Output:** `writing/paper/figures/` directory with PDFs, generation scripts, and LaTeX snippets.
 
 #### Phase 2b: AI Illustration Generation (when `illustration: true`)
 
@@ -103,10 +103,10 @@ If the paper plan includes architecture diagrams, pipeline figures, or method il
 
 **What this does:**
 - Codex plans the layout → Gemini optimizes → Nano Banana Pro renders → Codex reviews (score ≥ 9)
-- Output: `figures/ai_generated/*.png` — publication-quality method diagrams
+- Output: `writing/paper/figures/ai_generated/*.png` — publication-quality method diagrams
 - Requires `GEMINI_API_KEY` environment variable
 
-> **Without `illustration: true`:** Architecture diagrams must still be created manually (draw.io, Figma, TikZ) and placed in `figures/` before proceeding — same as before.
+> **Without `illustration: true`:** Architecture diagrams must still be created manually (draw.io, Figma, TikZ) and placed in `writing/paper/figures/` before proceeding — same as before.
 
 **Checkpoint:** List generated vs manual figures.
 
@@ -115,9 +115,9 @@ If the paper plan includes architecture diagrams, pipeline figures, or method il
 - Data plots (auto): [list]
 - AI illustrations (auto): [list, if illustration: true]
 - Manual (need your input): [list]
-- LaTeX snippets: figures/latex_includes.tex
+- LaTeX snippets: writing/paper/figures/latex_includes.tex
 
-[If manual figures needed]: Please add them to figures/ before I proceed.
+[If manual figures needed]: Please add them to writing/paper/figures/ before I proceed.
 [If all auto]: Shall I proceed with LaTeX writing?
 ```
 
@@ -131,14 +131,14 @@ Invoke `/paper-write` to generate section-by-section LaTeX:
 
 **What this does:**
 - Write each section following the plan, with proper LaTeX formatting
-- Insert figure/table references from `figures/latex_includes.tex`
+- Insert figure/table references from `writing/paper/figures/latex_includes.tex`
 - Build `references.bib` from citation scaffolding
 - Clean stale files from previous section structures
 - Automated bib cleaning (remove uncited entries)
 - De-AI polish (remove "delve", "pivotal", "landscape"...)
 - GPT-5.4 reviews each section for quality
 
-**Output:** `paper/` directory with `main.tex`, `sections/*.tex`, `references.bib`, `math_commands.tex`.
+**Output:** `writing/paper/` directory with `main.tex`, `sections/*.tex`, `references.bib`, `math_commands.tex`.
 
 **Checkpoint:** Report section completion.
 
@@ -156,7 +156,7 @@ Shall I proceed with compilation?
 Invoke `/paper-compile` to build the PDF:
 
 ```
-/paper-compile "paper/"
+/paper-compile "writing/paper/"
 ```
 
 **What this does:**
@@ -167,7 +167,7 @@ Invoke `/paper-compile` to build the PDF:
 - Precise page verification via `pdftotext`
 - Stale file detection
 
-**Output:** `paper/main.pdf`
+**Output:** `writing/paper/main.pdf`
 
 **Checkpoint:** Report compilation results.
 
@@ -187,7 +187,7 @@ Shall I proceed with the improvement loop?
 Invoke `/auto-paper-improvement-loop` to polish the paper:
 
 ```
-/auto-paper-improvement-loop "paper/"
+/auto-paper-improvement-loop "writing/paper/"
 ```
 
 **What this does (2 rounds):**
@@ -222,8 +222,8 @@ Invoke `/auto-paper-improvement-loop` to polish the paper:
 |-------|--------|--------|
 | 1. Paper Plan | ✅ | PAPER_PLAN.md |
 | 2. Figures | ✅ | figures/ ([N] auto + [M] manual) |
-| 3. LaTeX Writing | ✅ | paper/sections/*.tex ([N] sections, [M] citations) |
-| 4. Compilation | ✅ | paper/main.pdf ([X] pages) |
+| 3. LaTeX Writing | ✅ | writing/paper/sections/*.tex ([N] sections, [M] citations) |
+| 4. Compilation | ✅ | writing/paper/main.pdf ([X] pages) |
 | 5. Improvement | ✅ | [score0]/10 → [score2]/10 |
 
 ## Improvement Scores
@@ -234,11 +234,11 @@ Invoke `/auto-paper-improvement-loop` to polish the paper:
 | Round 2 | Z/10 | [summary] |
 
 ## Deliverables
-- paper/main.pdf — Final polished paper
-- paper/main_round0_original.pdf — Before improvement
-- paper/main_round1.pdf — After round 1
-- paper/main_round2.pdf — After round 2
-- paper/PAPER_IMPROVEMENT_LOG.md — Full review log
+- writing/paper/main.pdf — Final polished paper
+- writing/paper/main_round0_original.pdf — Before improvement
+- writing/paper/main_round1.pdf — After round 1
+- writing/paper/main_round2.pdf — After round 2
+- writing/paper/PAPER_IMPROVEMENT_LOG.md — Full review log
 
 ## Remaining Issues (if any)
 - [items from final review that weren't addressed]
