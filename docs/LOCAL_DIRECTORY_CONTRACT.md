@@ -6,7 +6,7 @@
 
 The upstream layout is workflow-first and root-relative:
 
-- `papers/` or `literature/` for local paper search
+- `literature/` for local paper search
 - `research/refine/` for refinement artifacts
 - `writing/paper/`, `writing/slides/`, `writing/poster/`, `writing/rebuttal/` for writing outputs
 - `research/IDEA_REPORT.md`, `research/AUTO_REVIEW.md`, `research/RESEARCH_BRIEF.md` in project root
@@ -81,7 +81,7 @@ project/
 | `research/contract.md` | `research/contract.md` |
 | `research/refine/` | `research/refine/` |
 | `writing/paper/` | `writing/paper/` |
-| top-level `figures/` for the paper pipeline | `writing/writing/paper/figures/` |
+| top-level `figures/` for the paper pipeline | `writing/paper/figures/` |
 | `writing/slides/` | `writing/slides/` |
 | `writing/poster/` | `writing/poster/` |
 | `writing/rebuttal/` | `writing/rebuttal/` |
@@ -94,7 +94,7 @@ project/
 - Keep planning and iterative refinement artifacts in `research/refine/`.
 - Keep runnable experiments in `exp/`.
 - Keep the current paper and all presentation assets under `writing/`.
-- Keep paper figures under `writing/writing/paper/figures/`.
+- Keep paper figures under `writing/paper/figures/`.
 - Within generated LaTeX or slide/poster files, relative asset references such as `figures/...` may still appear when they are relative to the output directory itself. The fork-level path change is about project structure, not internal LaTeX relative paths.
 
 ## Required Rewrite Scope

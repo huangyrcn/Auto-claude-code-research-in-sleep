@@ -176,9 +176,9 @@ List every figure and table:
 | ID | Type | Description | Data Source | Priority |
 |----|------|-------------|-------------|----------|
 | Fig 1 | Hero/Architecture | System overview + comparison | manual | HIGH |
-| Fig 2 | Line plot | Training curves comparison | figures/exp_A.json | HIGH |
-| Fig 3 | Bar chart | Ablation results | figures/ablation.json | MEDIUM |
-| Table 1 | Comparison table | Main results vs. baselines | figures/main_results.json | HIGH |
+| Fig 2 | Line plot | Training curves comparison | exp/results/exp_A.json | HIGH |
+| Fig 3 | Bar chart | Ablation results | exp/results/ablation.json | MEDIUM |
+| Table 1 | Comparison table | Main results vs. baselines | exp/results/main_results.json | HIGH |
 | Table 2 | Theory comparison | Prior bounds vs. ours | manual | HIGH (theory papers) |
 ```
 

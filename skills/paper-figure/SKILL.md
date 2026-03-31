@@ -120,7 +120,7 @@ For each figure in the plan, create a standalone Python script:
 from paper_plot_style import *
 import json
 
-with open('figures/exp_results.json') as f:
+with open('exp/results/exp_results.json') as f:
     data = json.load(f)
 
 fig, ax = plt.subplots(1, 1, figsize=(5, 3.5))

@@ -11,7 +11,7 @@ Search topic or arXiv paper ID: $ARGUMENTS
 
 ## Constants
 
-- **PAPER_DIR** - Local directory to save downloaded PDFs. Default: `papers/` in the current project directory.
+- **PAPER_DIR** - Local directory to save downloaded PDFs. Default: `literature/` in the current project directory.
 - **MAX_RESULTS = 10** - Default number of search results.
 - **FETCH_SCRIPT** - `tools/arxiv_fetch.py` relative to the ARIS install, or the same path relative to the current project. Fall back to inline Python if not found.
 
@@ -174,7 +174,7 @@ For each paper (downloaded or fetched by API):
   - [contribution 1]
   - [contribution 2]
   - [contribution 3]
-- **Local PDF**: papers/[ID].pdf (if downloaded)
+- **Local PDF**: literature/[ID].pdf (if downloaded)
 ```
 
 ### Step 6: Final Output

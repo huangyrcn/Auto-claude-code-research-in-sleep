@@ -62,7 +62,7 @@ ARIS reads the paper → finds its weaknesses → clones the codebase → genera
 | `max followup rounds` | `3` | Per-reviewer follow-up round limit |
 
 Three safety gates — rebuttal will NOT finalize if any fails:
-- 🔒 **No fabrication** — every claim maps to writing/paper/review/user-confirmed result
+- 🔒 **No fabrication** — every claim maps to a user-confirmed experiment result or cited paper artifact
 - 🔒 **No overpromise** — every promise is user-approved
 - 🔒 **Full coverage** — every reviewer concern is tracked
 
@@ -652,7 +652,7 @@ Got reviews back? `/rebuttal` parses them, builds a strategy, and drafts a venue
 > ⚙️ `VENUE`, `AUTO_EXPERIMENT`, `QUICK_MODE`, `MAX_STRESS_TEST_ROUNDS` are configurable — see [Customization](#%EF%B8%8F-customization).
 
 **Three safety gates — rebuttal will NOT finalize if any fails:**
-- 🔒 **Provenance** — every claim maps to writing/paper/review/user-confirmed result. No fabrication.
+- 🔒 **Provenance** — every claim maps to a user-confirmed experiment result or cited paper artifact. No fabrication.
 - 🔒 **Commitment** — every promise is user-approved. No overpromising.
 - 🔒 **Coverage** — every reviewer concern is tracked. Nothing disappears.
 
@@ -1271,7 +1271,7 @@ Override inline: `/experiment-bridge — base repo: https://github.com/org/proje
 
 | Constant | Default | Description |
 |----------|---------|-------------|
-| `PAPER_LIBRARY` | `papers/`, `literature/` | Local directories to scan for PDFs before searching online |
+| `PAPER_LIBRARY` | `literature/` | Local directory to scan for PDFs before searching online |
 | `MAX_LOCAL_PAPERS` | 20 | Max local PDFs to scan (first 3 pages each) |
 | `SOURCES` | `all` | Which sources to search: `zotero`, `obsidian`, `local`, `web`, `semantic-scholar`, or `all`. `semantic-scholar` must be explicitly listed |
 | `ARXIV_DOWNLOAD` | false | When `true`, download top relevant arXiv PDFs to PAPER_LIBRARY after search |
@@ -1319,7 +1319,7 @@ Don't have Claude / OpenAI API access? You can swap in other models — same cro
 | **Alt H** 🆕 | Antigravity (Claude Opus 4.6 / Gemini 3.1 Pro) | GPT-5.4 (Codex MCP) or any via llm-chat | No | Optional | [ANTIGRAVITY_ADAPTATION](docs/ANTIGRAVITY_ADAPTATION.md) |
 | **Alt I** 🆕 | Codex CLI | Gemini direct API (`gemini-review` MCP) | No | No | [CODEX_GEMINI_REVIEW_GUIDE](docs/CODEX_GEMINI_REVIEW_GUIDE.md) |
 
-**Alt C** supports tested providers: GLM (Z.ai), Kimi (Moonshot), LongCat (Meituan) as executors; DeepSeek, MiniMax as reviewers. Any OpenAI-compatible API should also work via the generic [`llm-chat`](mcp-servers/llm-chat/) MCP server. **Alt D** uses [Alibaba Coding Plan](https://bailian.console.aliyun.com/) — one API key for both executor and reviewer, 4 models included (Kimi, Qwen, GLM, MiniMax). **Alt E** uses [ModelScope](https://www.modelscope.cn/) — **free** (2000 calls/day), one key, no automation restrictions. **Alt G** keeps Codex as executor but swaps the reviewer to Claude Code CLI via the local `claude-review` MCP bridge, with async polling for long writing/paper/review prompts. **Alt H** uses [Google Antigravity](https://antigravity.google/) as the executor with native SKILL.md support — choose Claude Opus 4.6 (Thinking) or Gemini 3.1 Pro (high) as the execution model. **Alt I** keeps Codex as executor, adds only a thin `skills-codex-gemini-review` overlay, and routes the reviewer-aware predefined skills through the local `gemini-review` MCP bridge with direct Gemini API by default. It is the closest Gemini analogue to the existing Codex+Claude review path, while minimizing skill changes and now also covers poster PNG review via the same bridge. Free-tier availability, rate limits, and data-use terms remain subject to Google's current policy.
+**Alt C** supports tested providers: GLM (Z.ai), Kimi (Moonshot), LongCat (Meituan) as executors; DeepSeek, MiniMax as reviewers. Any OpenAI-compatible API should also work via the generic [`llm-chat`](mcp-servers/llm-chat/) MCP server. **Alt D** uses [Alibaba Coding Plan](https://bailian.console.aliyun.com/) — one API key for both executor and reviewer, 4 models included (Kimi, Qwen, GLM, MiniMax). **Alt E** uses [ModelScope](https://www.modelscope.cn/) — **free** (2000 calls/day), one key, no automation restrictions. **Alt G** keeps Codex as executor but swaps the reviewer to Claude Code CLI via the local `claude-review` MCP bridge, with async polling for long Claude review prompts. **Alt H** uses [Google Antigravity](https://antigravity.google/) as the executor with native SKILL.md support — choose Claude Opus 4.6 (Thinking) or Gemini 3.1 Pro (high) as the execution model. **Alt I** keeps Codex as executor, adds only a thin `skills-codex-gemini-review` overlay, and routes the reviewer-aware predefined skills through the local `gemini-review` MCP bridge with direct Gemini API by default. It is the closest Gemini analogue to the existing Codex+Claude review path, while minimizing skill changes and now also covers poster PNG review via the same bridge. Free-tier availability, rate limits, and data-use terms remain subject to Google's current policy.
 
 \* Alt G normally relies on local Codex CLI and Claude Code CLI logins. Direct API keys are optional, not required.
 
@@ -1398,7 +1398,7 @@ claude
 <summary>Show 6 more completed items</summary>
 
 - [x] **Configurable REVIEWER_MODEL** — all Codex-dependent skills support custom reviewer model (default `gpt-5.4`, also works with `gpt-5.3-codex`, `gpt-5.2-codex`, `o3`, etc.)
-- [x] **Local paper library scanning** — `/research-lit` scans local `papers/` and `literature/` directories before external search, leveraging papers you've already read
+- [x] **Local paper library scanning** — `/research-lit` scans the local `literature/` directory before external search, leveraging papers you've already read
 - [x] **Idea Discovery pipeline** — `/idea-discovery` orchestrates research-lit → idea-creator → novelty-check → research-review in one command, with pilot experiments on GPU
 - [x] **Full research pipeline** — `/research-pipeline` chains Workflow 1 (idea discovery) → implementation → Workflow 2 (auto-review-loop) end-to-end
 - [x] **Peer review skill** — `/peer-review` for reviewing others' papers as a conference reviewer, with GPT-5.4 meta-review (planned; currently use `/research-review` with a paper PDF)

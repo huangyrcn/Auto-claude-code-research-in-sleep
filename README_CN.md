@@ -1045,7 +1045,7 @@ Skills 就是普通的 Markdown 文件，fork 后随意改：
 
 | 常量 | 默认值 | 说明 |
 |------|--------|------|
-| `PAPER_LIBRARY` | `papers/`, `literature/` | 本地论文目录，搜外部之前先扫这里的 PDF |
+| `PAPER_LIBRARY` | `literature/` | 本地论文目录，搜外部之前先扫这里的 PDF |
 | `MAX_LOCAL_PAPERS` | 20 | 最多扫描多少本地 PDF（每篇读前 3 页） |
 | `SOURCES` | `all` | 搜索哪些源：`zotero`、`obsidian`、`local`、`web`、`all`（逗号分隔） |
 | `ARXIV_DOWNLOAD` | false | 设为 `true` 时，搜索后自动下载最相关的 arXiv PDF 到 PAPER_LIBRARY |
@@ -1173,7 +1173,7 @@ claude
 
 - [x] **可配置 REVIEWER_MODEL** — 所有依赖 Codex 的 skill 支持自定义审稿模型（默认 `gpt-5.4`，也支持 `gpt-5.3-codex`、`gpt-5.2-codex`、`o3` 等）
 
-- [x] **本地论文库扫描** — `/research-lit` 在外部搜索前先扫描本地 `papers/` 和 `literature/` 目录，复用已读论文
+- [x] **本地论文库扫描** — `/research-lit` 在外部搜索前先扫描本地 `literature/` 目录，复用已读论文
 - [x] **Idea Discovery 流水线** — `/idea-discovery` 一键编排 research-lit → idea-creator → novelty-check → research-review，含 GPU pilot 实验
 - [x] **全流程研究管线** — `/research-pipeline` 串联 Workflow 1（idea discovery）→ 实现 → Workflow 2（auto-review-loop），端到端
 - [x] **Peer Review skill** — `/peer-review` 以审稿人视角审阅他人论文，含 GPT-5.4 meta-review（规划中；目前可用 `/research-review` + 论文 PDF 实现）

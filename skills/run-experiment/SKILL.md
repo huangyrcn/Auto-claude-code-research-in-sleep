@@ -74,9 +74,13 @@ Check the project's `CLAUDE.md` for a `code_sync` setting. If not specified, def
 
 #### Option A: rsync (default)
 
-Only sync necessary files — NOT data, checkpoints, or large files:
+Sync code plus the generated run manifest directory — NOT data, checkpoints, or large files:
 ```bash
-rsync -avz --include='*.py' --exclude='*' <local_src>/ <server>:<remote_workdir>/
+rsync -avz \
+  --include='*.py' --include='*.yaml' --include='*.yml' --include='*.json' \
+  --include='*.sh' --include='*/' \
+  --exclude='*.pt' --exclude='*.pth' --exclude='*.ckpt' --exclude='data/' --exclude='outputs/' \
+  <local_src>/ <server>:<remote_workdir>/
 ```
 
 #### Option B: git (when `code_sync: git` is set in CLAUDE.md)
@@ -88,6 +92,9 @@ git add -A && git commit -m "sync: experiment deployment" && git push
 
 # 2. Pull on server
 ssh <server> "cd <remote_workdir> && git pull"
+
+# 3. Copy the per-run manifest artifacts (do not commit these)
+rsync -avz exp/runs/<run_id>/ <server>:<remote_workdir>/exp/runs/<run_id>/
 ```
 
 Benefits: version-tracked, multi-server sync with one push, no rsync include/exclude rules needed.
@@ -113,7 +120,36 @@ ssh -p <PORT> root@<HOST> "pip install -q -r /workspace/requirements.txt"
 
 ### Step 3.2: Reserve Run Handles
 
-Before deployment, create the runtime manifest for each experiment:
+Before deployment, create the runtime manifest for each experiment. Prefer the built-in helper:
+
+```bash
+python3 tools/prepare_run_manifest.py \
+  --slug main-method \
+  --command 'CUDA_VISIBLE_DEVICES=0 python train.py --config configs/main.yaml' \
+  --gpu-mode remote \
+  --host my-gpu-server \
+  --remote-root /home/user/experiments \
+  --activation-cmd 'eval "$(/opt/conda/bin/conda shell.bash hook)" && conda activate research'
+```
+
+This creates:
+
+- `exp/runs/<run_id>/launch.sh`
+- `exp/runs/<run_id>/run.json`
+- `exp/logs/<run_id>.log` (reserved path)
+- `exp/results/<run_id>.json` (reserved path)
+
+Read the JSON printed by the helper and capture:
+
+- `run_id`
+- `session_name`
+- `log_path`
+- `result_path`
+- `remote_workdir`
+
+Only fall back to manual creation if `tools/prepare_run_manifest.py` is unavailable.
+
+Manual fallback requirements:
 
 1. Generate a `run_id`
 2. Create `exp/runs/<run_id>/launch.sh`
@@ -183,9 +219,10 @@ Before deploying, ensure the experiment scripts have W&B logging:
 
 #### Remote (via SSH + tmux)
 
-For each experiment, create a dedicated `tmux` session with GPU binding:
+For each experiment, sync the generated manifest directory first, then create a dedicated `tmux` session with GPU binding:
 ```bash
-ssh <server> "mkdir -p <remote_workdir>/exp/runs/<run_id> <remote_workdir>/exp/logs <remote_workdir>/exp/results && \
+rsync -avz exp/runs/<run_id>/ <server>:<remote_workdir>/exp/runs/<run_id>/ && \
+ssh <server> "mkdir -p <remote_workdir>/exp/logs <remote_workdir>/exp/results && \
   tmux new-session -d -s <session_name> '\
   cd <remote_workdir> && \
   bash exp/runs/<run_id>/launch.sh'"
@@ -203,7 +240,8 @@ CUDA_VISIBLE_DEVICES=<gpu_id> python <script> <args> 2>&1 | tee exp/logs/<run_id
 
 No conda needed — the Docker image has the environment. Use `/workspace/project/` as working dir:
 ```bash
-ssh -p <PORT> root@<HOST> "mkdir -p /workspace/project/exp/runs/<run_id> /workspace/project/exp/logs /workspace/project/exp/results && \
+rsync -avz -e "ssh -p <PORT>" exp/runs/<run_id>/ root@<HOST>:/workspace/project/exp/runs/<run_id>/ && \
+ssh -p <PORT> root@<HOST> "mkdir -p /workspace/project/exp/logs /workspace/project/exp/results && \
   tmux new-session -d -s <session_name> '\
   cd /workspace/project && \
   bash exp/runs/<run_id>/launch.sh'"
@@ -290,7 +328,7 @@ After the experiment completes (detected via `/monitor-experiment` or tmux sessi
 
 - ALWAYS check GPU availability first — never blindly assign GPUs
 - Each experiment gets its own `tmux` session + GPU binding
-- Every launch must have a `run_id`, `run.json`, `launch.sh`, log file, and result path
+- Prefer `tools/prepare_run_manifest.py` to create `run_id`, `run.json`, `launch.sh`, log path, and result path
 - Use `tee` to save logs to `exp/logs/<run_id>.log`
 - Run deployment commands with `run_in_background: true` to keep conversation responsive
 - Report back: which GPU, which `tmux` session, which `run_id`, what command, estimated time

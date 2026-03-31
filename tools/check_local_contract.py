@@ -2,43 +2,26 @@
 from __future__ import annotations
 
 import re
-import sys
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SKIP_PARTS = {".git", "__pycache__"}
-TEXT_EXTS = {".md", ".py", ".txt", ".json", ".yaml", ".yml", ".toml", ".tex", ".sh"}
-
-
-CHECKS = [
-    (re.compile(r"research/refine/"), "old refine-logs path"),
-    (re.compile(r"(?<!research/)RESEARCH_BRIEF\.md\b"), "root research/RESEARCH_BRIEF.md"),
-    (re.compile(r"(?<!research/)IDEA_REPORT\.md\b"), "root research/IDEA_REPORT.md"),
-    (re.compile(r"(?<!research/)AUTO_REVIEW\.md\b"), "root research/AUTO_REVIEW.md"),
-    (re.compile(r"(?<!research/)REVIEW_STATE\.json\b"), "root research/REVIEW_STATE.json"),
-    (re.compile(r"(?<!research/)IDEA_CANDIDATES\.md\b"), "root research/IDEA_CANDIDATES.md"),
-    (re.compile(r"(?<!research/)EXPERIMENT_LOG\.md\b"), "root research/EXPERIMENT_LOG.md"),
-    (re.compile(r"(?<!research/)findings\.md\b"), "root research/findings.md"),
-    (re.compile(r"\bpapers/"), "old papers/ path"),
+TARGETS = [
+    ROOT / "README.md",
+    ROOT / "README_CN.md",
+    *sorted(
+        path
+        for path in (ROOT / "skills").rglob("*.md")
+        if not any(part.startswith("skills-codex") for part in path.parts)
+    ),
 ]
 
-
-def iter_text_files() -> list[Path]:
-    files: list[Path] = []
-    for path in ROOT.rglob("*"):
-        if not path.is_file():
-            continue
-        if any(part in SKIP_PARTS for part in path.parts):
-            continue
-        if path.suffix.lower() not in TEXT_EXTS and path.name not in {"README.md", "README_CN.md"}:
-            continue
-        try:
-            path.read_text()
-        except Exception:
-            continue
-        files.append(path)
-    return files
+CHECKS = [
+    (re.compile(r"\brefine-logs/"), "old refine-logs/ path"),
+    (re.compile(r"\bpapers/"), "old papers/ path"),
+    (re.compile(r"writing/writing/"), "duplicated writing/ path"),
+    (re.compile(r"writing/paper/review/"), "malformed writing/paper/review path"),
+]
 
 
 def rel(path: Path) -> str:
@@ -47,7 +30,7 @@ def rel(path: Path) -> str:
 
 def main() -> int:
     failures: list[str] = []
-    for path in iter_text_files():
+    for path in TARGETS:
         text = path.read_text()
         for regex, label in CHECKS:
             for match in regex.finditer(text):
