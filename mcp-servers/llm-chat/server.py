@@ -113,10 +113,12 @@ def call_llm(messages, model=None):
 
                 data = response.json()
                 content = data["choices"][0]["message"]["content"]
-                if attempt > 0:
+                if current_model != use_model:
                     fallback_note = f"\n\n[Note: Used fallback model {current_model} after 504 timeout with {use_model}]"
                     content = fallback_note + "\n" + content
                     debug_log(f"API success with fallback model {current_model}, response length: {len(content)}")
+                elif attempt > 0:
+                    debug_log(f"API success on retry (attempt {attempt + 1}), response length: {len(content)}")
                 else:
                     debug_log(f"API success, response length: {len(content)}")
                 return content, None
