@@ -62,6 +62,11 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/tools/meta_opt/log_event.sh\"",
             "timeout": 5,
             "async": true
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/tools/meta_opt/check_ready.sh\"",
+            "timeout": 5
           }
         ]
       }

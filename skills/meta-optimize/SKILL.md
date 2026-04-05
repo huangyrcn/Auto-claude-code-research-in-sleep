@@ -223,11 +223,19 @@ The log at `.aris/meta/events.jsonl` contains JSONL records with these shapes:
 
 ## Triggering
 
-This skill is NOT part of the standard W1→W1.5→W2→W3→W4 pipeline. It is a **maintenance workflow** invoked periodically:
+This skill is NOT part of the standard W1→W1.5→W2→W3→W4 pipeline. It is a **maintenance workflow** with three trigger mechanisms:
 
-- **Passive logging**: Hooks record events automatically (zero user effort)
-- **Manual trigger**: User runs `/meta-optimize` when they want to check for improvements
-- **Session-end hint**: After sufficient data accumulates (≥5 workflow runs), the system may suggest running `/meta-optimize`
+1. **Passive logging** (always on): Claude Code hooks record events to `.aris/meta/events.jsonl` automatically during normal usage. Zero user effort.
+
+2. **Automatic readiness check** (SessionEnd hook): When a Claude Code session ends, `check_ready.sh` counts skill invocations since the last `/meta-optimize` run. If ≥5 new invocations have accumulated, it prints a reminder:
+   ```
+   📊 ARIS has logged 8 skill runs since last optimization. Run /meta-optimize to check for improvement opportunities.
+   ```
+   This is a **suggestion only** — it does not auto-run optimization.
+
+3. **Manual trigger**: User runs `/meta-optimize` when they see the reminder or whenever they want.
+
+**After each `/meta-optimize` run**, the skill writes the current timestamp to `.aris/meta/.last_optimize` so the readiness check only counts new invocations.
 
 ## Acknowledgements
 
