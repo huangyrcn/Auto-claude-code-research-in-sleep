@@ -47,12 +47,12 @@ project/
 │       ├── REFINE_STATE.json
 │       ├── score-history.md
 │       └── round-*.md
+├── data/
 ├── exp/
 │   ├── scripts/
 │   ├── logs/
 │   ├── results/
-│   ├── ckpts/
-│   └── data/
+│   └── ckpts/
 └── writing/
     ├── writing/paper/
     │   ├── main.tex

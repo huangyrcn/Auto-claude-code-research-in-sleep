@@ -66,6 +66,10 @@ LITERATURE_GLOBAL_REPLACEMENTS = [
     (r"\bpapers/\b", "literature/"),
 ]
 
+DATA_GLOBAL_REPLACEMENTS = [
+    (r"\bexp/data/", "data/"),
+]
+
 
 PAPER_PIPELINE_FILES = {
     "README.md",
@@ -143,6 +147,7 @@ def apply_regexes(text: str, replacements: list[tuple[str, str]]) -> str:
 def apply_global_contract(text: str) -> str:
     out = apply_regexes(text, RESEARCH_GLOBAL_REPLACEMENTS)
     out = apply_regexes(out, LITERATURE_GLOBAL_REPLACEMENTS)
+    out = apply_regexes(out, DATA_GLOBAL_REPLACEMENTS)
     out = re.sub(r"literature/\*\*/\.pdf,\s*literature/\*\*/\.pdf", "literature/**/*.pdf", out)
     out = re.sub(r"literature/\*\*/paper\.md,\s*literature/\*\*/\.pdf", "literature/**/paper.md, literature/**/*.pdf", out)
     return out

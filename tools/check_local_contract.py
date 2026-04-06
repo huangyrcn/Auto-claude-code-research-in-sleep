@@ -21,6 +21,7 @@ CHECKS = [
     (re.compile(r"\bpapers/"), "old papers/ path"),
     (re.compile(r"writing/writing/"), "duplicated writing/ path"),
     (re.compile(r"writing/paper/review/"), "malformed writing/paper/review path"),
+    (re.compile(r"\bexp/data[/\\]"), "data should be at project root, not under exp/"),
 ]
 
 

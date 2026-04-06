@@ -40,6 +40,7 @@ project/
 │   ├── EXPERIMENT_LOG.md
 │   ├── findings.md
 │   └── refine/
+├── data/
 ├── exp/
 └── writing/
     ├── paper/
