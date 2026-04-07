@@ -6,14 +6,14 @@
 
 The upstream layout is workflow-first and root-relative:
 
-- `literature/` for local paper search
+- `papers/` for local paper search
 - `research/refine/` for refinement artifacts
 - `writing/paper/`, `writing/slides/`, `writing/poster/`, `writing/rebuttal/` for writing outputs
 - `research/IDEA_REPORT.md`, `research/AUTO_REVIEW.md`, `research/RESEARCH_BRIEF.md` in project root
 
 This local fork intentionally changes that contract. The project should be organized by domain:
 
-1. `literature/` — reference papers and imported external material
+1. `papers/` — reference papers and imported external material
 2. `research/` — iterative state, review logs, planning artifacts
 3. `exp/` — runnable experiments and outputs
 4. `writing/` — submission-facing outputs
@@ -25,7 +25,7 @@ This is a real fork-level path change, not a compatibility alias layer.
 ```text
 project/
 ├── CLAUDE.md
-├── literature/
+├── papers/
 │   └── ...                        # local paper library, notes, imported papers
 ├── research/
 │   ├── research/RESEARCH_BRIEF.md
@@ -69,8 +69,8 @@ project/
 
 | Upstream default | Local fork path |
 |---|---|
-| `papers/` | `literature/` |
-| `literature/` | `literature/` |
+| `papers/` | `papers/` |
+| `literature/` | `papers/` |
 | `research/RESEARCH_BRIEF.md` | `research/RESEARCH_BRIEF.md` |
 | `research/IDEA_REPORT.md` | `research/IDEA_REPORT.md` |
 | `research/AUTO_REVIEW.md` | `research/AUTO_REVIEW.md` |
@@ -89,7 +89,7 @@ project/
 
 ## Design Rules
 
-- Keep external reference material in `literature/`.
+- Keep external reference material in `papers/`.
 - Keep workflow state and recovery files in `research/`.
 - Keep planning and iterative refinement artifacts in `research/refine/`.
 - Keep runnable experiments in `exp/`.

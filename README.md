@@ -1440,7 +1440,7 @@ Override inline: `/experiment-bridge — base repo: https://github.com/org/proje
 
 | Constant | Default | Description |
 |----------|---------|-------------|
-| `PAPER_LIBRARY` | `literature/` | Local directory to scan for PDFs before searching online |
+| `PAPER_LIBRARY` | `papers/` | Local directory to scan for PDFs before searching online |
 | `MAX_LOCAL_PAPERS` | 20 | Max local PDFs to scan (first 3 pages each) |
 | `SOURCES` | `all` | Which sources to search: `zotero`, `obsidian`, `local`, `web`, `semantic-scholar`, or `all`. `semantic-scholar` must be explicitly listed |
 | `ARXIV_DOWNLOAD` | false | When `true`, download top relevant arXiv PDFs to PAPER_LIBRARY after search |
@@ -1567,7 +1567,7 @@ claude
 <summary>Show 6 more completed items</summary>
 
 - [x] **Configurable REVIEWER_MODEL** — all Codex-dependent skills support custom reviewer model (default `gpt-5.4`, also works with `gpt-5.3-codex`, `gpt-5.2-codex`, `o3`, etc.)
-- [x] **Local paper library scanning** — `/research-lit` scans the local `literature/` directory before external search, leveraging papers you've already read
+- [x] **Local paper library scanning** — `/research-lit` scans the local `papers/` directory before external search, leveraging papers you've already read
 - [x] **Idea Discovery pipeline** — `/idea-discovery` orchestrates research-lit → idea-creator → novelty-check → research-review in one command, with pilot experiments on GPU
 - [x] **Full research pipeline** — `/research-pipeline` chains Workflow 1 (idea discovery) → implementation → Workflow 2 (auto-review-loop) end-to-end
 - [x] **Peer review skill** — `/peer-review` for reviewing others' papers as a conference reviewer, with GPT-5.4 meta-review (planned; currently use `/research-review` with a paper PDF)

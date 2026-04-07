@@ -30,7 +30,7 @@ The local project layout should converge to:
 
 ```text
 project/
-├── literature/
+├── papers/
 ├── research/
 │   ├── RESEARCH_BRIEF.md
 │   ├── IDEA_REPORT.md
@@ -58,7 +58,7 @@ project/
 
 Expected relocation examples:
 
-- `papers/` or `literature/` -> `literature/`
+- `papers/` or `literature/` -> `papers/`
 - `RESEARCH_BRIEF.md` -> `research/RESEARCH_BRIEF.md`
 - `IDEA_REPORT.md` -> `research/IDEA_REPORT.md`
 - `AUTO_REVIEW.md` -> `research/AUTO_REVIEW.md`

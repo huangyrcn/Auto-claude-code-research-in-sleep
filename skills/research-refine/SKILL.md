@@ -37,7 +37,7 @@ User input (PROBLEM + vague APPROACH)
 - **MAX_ROUNDS = 5** — Maximum review-revise rounds.
 - **SCORE_THRESHOLD = 9** — Minimum overall score to stop.
 - **OUTPUT_DIR = `research/refine/`** — Directory for round files and final report.
-- **MAX_LOCAL_PAPERS = 15** — Maximum local literature/notes to scan for grounding.
+- **MAX_LOCAL_PAPERS = 15** — Maximum local papers/notes to scan for grounding.
 - **MAX_CORE_EXPERIMENTS = 3** — Default cap for core validation blocks inside this skill.
 - **MAX_PRIMARY_CLAIMS = 2** — Soft cap for paper-level claims. Prefer one dominant claim plus one supporting claim.
 - **MAX_NEW_TRAINABLE_COMPONENTS = 2** — Soft cap for genuinely new trainable pieces. Exceed only if the paper breaks otherwise.
@@ -143,7 +143,7 @@ If later reviewer feedback would change the problem being solved, mark that as *
 
 #### Step 1.1: Scan Grounding Material
 
-Check `literature/` first. Read only the relevant parts needed to answer:
+Check `papers/` first. Read only the relevant parts needed to answer:
 
 - What mechanism do current methods use?
 - Where exactly do they fail for this problem?

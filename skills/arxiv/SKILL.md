@@ -11,14 +11,14 @@ Search topic or arXiv paper ID: $ARGUMENTS
 
 ## Constants
 
-- **PAPER_DIR** - Local directory to save downloaded PDFs. Default: `literature/` in the current project directory.
+- **PAPER_DIR** - Local directory to save downloaded PDFs. Default: `papers/` in the current project directory.
 - **MAX_RESULTS = 10** - Default number of search results.
 - **FETCH_SCRIPT** - `tools/arxiv_fetch.py` relative to the ARIS install, or the same path relative to the current project. Fall back to inline Python if not found.
 
 > Overrides (append to arguments):
 > - `/arxiv "attention mechanism" - max: 20` - return up to 20 results
 > - `/arxiv "2301.07041" - download` - download a specific paper by ID
-> - `/arxiv "query" - dir: literature/` - save PDFs to a custom directory
+> - `/arxiv "query" - dir: papers/` - save PDFs to a custom directory
 > - `/arxiv "query" - download: all` - download all result PDFs
 
 ## Workflow
@@ -29,7 +29,7 @@ Parse `$ARGUMENTS` for directives:
 
 - **Query or ID**: main search term or a bare arXiv ID such as `2301.07041` or `cs/0601001`
 - **`- max: N`**: override MAX_RESULTS (e.g., `- max: 20`)
-- **`- dir: PATH`**: override PAPER_DIR (e.g., `- dir: literature/`)
+- **`- dir: PATH`**: override PAPER_DIR (e.g., `- dir: papers/`)
 - **`- download`**: download the first result's PDF after listing
 - **`- download: all`**: download PDFs for all results
 
@@ -156,7 +156,7 @@ After each download:
 
 - Confirm file size > 10 KB (reject smaller files - likely an error HTML page)
 - Add a 1-second delay between consecutive downloads to avoid rate limiting
-- Report: `Downloaded: literature/2301.07041.pdf (842 KB)`
+- Report: `Downloaded: papers/2301.07041.pdf (842 KB)`
 
 ### Step 5: Summarize
 
@@ -174,7 +174,7 @@ For each paper (downloaded or fetched by API):
   - [contribution 1]
   - [contribution 2]
   - [contribution 3]
-- **Local PDF**: literature/[ID].pdf (if downloaded)
+- **Local PDF**: papers/[ID].pdf (if downloaded)
 ```
 
 ### Step 6: Final Output
@@ -182,7 +182,7 @@ For each paper (downloaded or fetched by API):
 Summarize what was done:
 
 - `Found N papers for "query"`
-- `Downloaded: literature/2301.07041.pdf (842 KB)` (for each download)
+- `Downloaded: papers/2301.07041.pdf (842 KB)` (for each download)
 - Any warnings (rate limit hit, file too small, already exists)
 
 Suggest follow-up skills:

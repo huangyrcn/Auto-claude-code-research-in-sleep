@@ -12,7 +12,7 @@ Research topic: $ARGUMENTS
 ## Constants
 
 - **PAPER_LIBRARY** — Local directory containing user's paper collection (PDFs). Check these paths in order:
-  1. `literature/` in the current project directory
+  1. `papers/` in the current project directory
   2. Custom path specified by user in `CLAUDE.md` under `## Paper Library`
 - **MAX_LOCAL_PAPERS = 20** — Maximum number of local PDFs to scan (read first 3 pages each). If more are found, prioritize by filename relevance to the topic.
 - **ARXIV_DOWNLOAD = false** — When `true`, download top 3-5 most relevant arXiv PDFs to PAPER_LIBRARY after search. When `false` (default), only fetch metadata (title, abstract, authors) via arXiv API — no files are downloaded.
@@ -55,7 +55,7 @@ Examples:
 |----------|--------|----|---------------|-----------------|
 | 1 | **Zotero** (via MCP) | `zotero` | Try calling any `mcp__zotero__*` tool — if unavailable, skip | Collections, tags, annotations, PDF highlights, BibTeX, semantic search |
 | 2 | **Obsidian** (via MCP) | `obsidian` | Try calling any `mcp__obsidian-vault__*` tool — if unavailable, skip | Research notes, paper summaries, tagged references, wikilinks |
-| 3 | **Local PDFs** | `local` | `Glob: literature/**/*.pdf` | Raw PDF content (first 3 pages) |
+| 3 | **Local PDFs** | `local` | `Glob: papers/**/*.pdf` | Raw PDF content (first 3 pages) |
 | 4 | **Web search** | `web` | Always available (WebSearch) | arXiv, Semantic Scholar, Google Scholar |
 | 5 | **Semantic Scholar API** | `semantic-scholar` | `tools/semantic_scholar_fetch.py` exists | Published venue papers (IEEE, ACM, Springer) with structured metadata: citation counts, venue info, TLDR. **Only runs when explicitly requested** via `— sources: semantic-scholar` or `— sources: web, semantic-scholar` |
 
@@ -105,7 +105,7 @@ Before searching online, check if the user already has relevant papers locally:
 
 1. **Locate library**: Check PAPER_LIBRARY paths for PDF files
    ```
-   Glob: literature/**/*.pdf
+   Glob: papers/**/*.pdf
    ```
 
 2. **De-duplicate against Zotero**: If Step 0a found papers, skip any local PDFs already covered by Zotero results (match by filename or title).
@@ -172,7 +172,7 @@ If `semantic_scholar_fetch.py` is not found, skip silently.
 After all sources are searched and papers are ranked by relevance:
 ```bash
 # Download top N most relevant arXiv papers
-python3 "$SCRIPT" download ARXIV_ID --dir literature/
+python3 "$SCRIPT" download ARXIV_ID --dir papers/
 ```
 - Only download papers ranked in the top ARXIV_MAX_DOWNLOAD by relevance
 - Skip papers already in the local library
@@ -206,7 +206,7 @@ Plus a narrative summary of the landscape (3-5 paragraphs).
 If Zotero BibTeX was exported, include a `references.bib` snippet for direct use in paper writing.
 
 ### Step 5: Save (if requested)
-- Save paper PDFs to `literature/`
+- Save paper PDFs to `papers/`
 - Update related work notes in project memory
 - If Obsidian is available, optionally create a literature review note in the vault
 

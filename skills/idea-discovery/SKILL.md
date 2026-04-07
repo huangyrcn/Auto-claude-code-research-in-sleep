@@ -64,7 +64,7 @@ Summarize the reference paper before searching the literature:
    - Invoke `/arxiv "ARXIV_ID" — download` to fetch the PDF
    - Read the first 5 pages (title, abstract, intro, method overview)
 
-2. **If local PDF path** (e.g., `literature/reference.pdf`):
+2. **If local PDF path** (e.g., `papers/reference.pdf`):
    - Read the PDF directly (first 5 pages)
 
 3. **If other URL**:

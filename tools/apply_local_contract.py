@@ -62,8 +62,8 @@ RESEARCH_GLOBAL_REPLACEMENTS = [
 ]
 
 
-LITERATURE_GLOBAL_REPLACEMENTS = [
-    (r"\bpapers/\b", "literature/"),
+PAPER_LIBRARY_GLOBAL_REPLACEMENTS = [
+    (r"\bliterature/\b", "papers/"),
 ]
 
 DATA_GLOBAL_REPLACEMENTS = [
@@ -146,10 +146,10 @@ def apply_regexes(text: str, replacements: list[tuple[str, str]]) -> str:
 
 def apply_global_contract(text: str) -> str:
     out = apply_regexes(text, RESEARCH_GLOBAL_REPLACEMENTS)
-    out = apply_regexes(out, LITERATURE_GLOBAL_REPLACEMENTS)
+    out = apply_regexes(out, PAPER_LIBRARY_GLOBAL_REPLACEMENTS)
     out = apply_regexes(out, DATA_GLOBAL_REPLACEMENTS)
-    out = re.sub(r"literature/\*\*/\.pdf,\s*literature/\*\*/\.pdf", "literature/**/*.pdf", out)
-    out = re.sub(r"literature/\*\*/paper\.md,\s*literature/\*\*/\.pdf", "literature/**/paper.md, literature/**/*.pdf", out)
+    out = re.sub(r"papers/\*\*/\.pdf,\s*papers/\*\*/\.pdf", "papers/**/*.pdf", out)
+    out = re.sub(r"papers/\*\*/paper\.md,\s*papers/\*\*/\.pdf", "papers/**/paper.md, papers/**/*.pdf", out)
     return out
 
 

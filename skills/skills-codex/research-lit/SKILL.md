@@ -11,8 +11,7 @@ Research topic: $ARGUMENTS
 
 - **PAPER_LIBRARY** — Local directory containing user's paper collection (PDFs). Check these paths in order:
   1. `papers/` in the current project directory
-  2. `literature/` in the current project directory
-  3. Custom path specified by user in `AGENTS.md` under `## Paper Library`
+  2. Custom path specified by user in `AGENTS.md` under `## Paper Library`
 - **MAX_LOCAL_PAPERS = 20** — Maximum number of local PDFs to scan (read first 3 pages each). If more are found, prioritize by filename relevance to the topic.
 - **ARXIV_DOWNLOAD = false** — When `true`, download top 3-5 most relevant arXiv PDFs to PAPER_LIBRARY after search. When `false` (default), only fetch metadata (title, abstract, authors) via arXiv API — no files are downloaded.
 - **ARXIV_MAX_DOWNLOAD = 5** — Maximum number of PDFs to download when `ARXIV_DOWNLOAD = true`.
@@ -51,7 +50,7 @@ Examples:
 |----------|--------|----|---------------|-----------------|
 | 1 | **Zotero** (via MCP) | `zotero` | Try calling any `mcp__zotero__*` tool — if unavailable, skip | Collections, tags, annotations, PDF highlights, BibTeX, semantic search |
 | 2 | **Obsidian** (via MCP) | `obsidian` | Try calling any `mcp__obsidian-vault__*` tool — if unavailable, skip | Research notes, paper summaries, tagged references, wikilinks |
-| 3 | **Local PDFs** | `local` | `Glob: papers/**/*.pdf, literature/**/*.pdf` | Raw PDF content (first 3 pages) |
+| 3 | **Local PDFs** | `local` | `Glob: papers/**/*.pdf` | Raw PDF content (first 3 pages) |
 | 4 | **Web search** | `web` | Always available (WebSearch) | arXiv, Semantic Scholar, Google Scholar |
 
 > **Graceful degradation**: If no MCP servers are configured, the skill works exactly as before (local PDFs + web search). Zotero and Obsidian are pure additions.
@@ -100,7 +99,7 @@ Before searching online, check if the user already has relevant papers locally:
 
 1. **Locate library**: Check PAPER_LIBRARY paths for PDF files
    ```
-   Glob: papers/**/*.pdf, literature/**/*.pdf
+   Glob: papers/**/*.pdf
    ```
 
 2. **De-duplicate against Zotero**: If Step 0a found papers, skip any local PDFs already covered by Zotero results (match by filename or title).
@@ -178,7 +177,7 @@ Plus a narrative summary of the landscape (3-5 paragraphs).
 If Zotero BibTeX was exported, include a `references.bib` snippet for direct use in paper writing.
 
 ### Step 5: Save (if requested)
-- Save paper PDFs to `literature/` or `papers/`
+- Save paper PDFs to `papers/`
 - Update related work notes in project memory
 - If Obsidian is available, optionally create a literature review note in the vault
 
@@ -189,4 +188,3 @@ If Zotero BibTeX was exported, include a `references.bib` snippet for direct use
 - Note if a paper directly competes with or supports our approach
 - **Never fail because a MCP server is not configured** — always fall back gracefully to the next data source
 - Zotero/Obsidian tools may have different names depending on how the user configured the MCP server (e.g., `mcp__zotero__search` or `mcp__zotero-mcp__search_items`). Try the most common patterns and adapt.
-

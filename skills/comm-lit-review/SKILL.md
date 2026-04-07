@@ -26,7 +26,7 @@ If the center of gravity is generic ML architecture research, pure control theor
 ## Constants
 
 - **PAPER_LIBRARY**: Check local PDFs in this order:
-  1. `literature/` in the current project
+  1. `papers/` in the current project
   2. Custom path specified by the user in `CLAUDE.md` under `## Paper Library`
 - **MAX_LOCAL_PAPERS = 20**: Maximum number of local PDFs to scan. If there are more, prioritize by filename and first-page relevance.
 
@@ -63,7 +63,7 @@ This is a knowledge-base-first skill. Search in this order unless the user overr
 
 1. `Zotero`
 2. `Obsidian`
-3. local `literature/`
+3. local `papers/`
 4. `IEEE Xplore`
 5. `ScienceDirect`
 6. `ACM Digital Library`
@@ -182,7 +182,7 @@ If available:
 
 Run this step if `local` is enabled.
 
-1. locate PDFs from `literature/**/*.pdf`
+1. locate PDFs from `papers/**/*.pdf`
 2. de-duplicate against Zotero hits when possible
 3. read the first pages of relevant PDFs
 4. extract title, authors, year, problem, method, and relevance
