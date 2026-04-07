@@ -188,7 +188,7 @@ Invoke `/research-lit` to ground the proposal in real literature, then search fo
 
 **What this does:**
 - Reuse existing surveys if `/research-lit` was already run and notes exist
-- Otherwise invoke `/research-lit` for multi-source literature search (arXiv, Scholar, Zotero, local PDFs)
+- Otherwise invoke `/research-lit` for multi-source literature search (arXiv, Scholar, Zotero, local paper packages)
 - Search for **funded projects** in the same area via WebSearch:
   - KAKENHI → KAKEN database (https://kaken.nii.ac.jp/)
   - NSF → NSF Award Search (https://www.nsf.gov/awardsearch/)

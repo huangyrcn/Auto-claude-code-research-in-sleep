@@ -25,10 +25,10 @@ If the center of gravity is generic ML architecture research, pure control theor
 
 ## Constants
 
-- **PAPER_LIBRARY**: Check local PDFs in this order:
+- **PAPER_LIBRARY**: Check local paper packages in this order:
   1. `papers/` in the current project
   2. Custom path specified by the user in `CLAUDE.md` under `## Paper Library`
-- **MAX_LOCAL_PAPERS = 20**: Maximum number of local PDFs to scan. If there are more, prioritize by filename and first-page relevance.
+- **MAX_LOCAL_PAPERS = 20**: Maximum number of local paper packages to scan. Prefer `metadata.yaml` and `paper/paper.md`; only read raw PDFs when Markdown is unavailable.
 
 ## Source Selection
 
@@ -178,15 +178,16 @@ If available:
 2. collect summaries, wikilinks, tags, and paper references
 3. treat these notes as the user's processed understanding of the topic
 
-### Step 0c: Scan Local Paper Library
+### Step 0c: Scan Local Paper Packages
 
 Run this step if `local` is enabled.
 
-1. locate PDFs from `papers/**/*.pdf`
-2. de-duplicate against Zotero hits when possible
-3. read the first pages of relevant PDFs
-4. extract title, authors, year, problem, method, and relevance
-5. use local hits to guide and de-duplicate later external search
+1. locate package roots from `papers/**/metadata.yaml`, `papers/**/paper/paper.md`, and `papers/**/paper/paper.pdf`; only fall back to legacy `papers/**/*.pdf`
+2. de-duplicate against Zotero hits using DOI, arXiv ID, normalized title, then filename/path
+3. prefer `metadata.yaml` and `paper/paper.md` when screening relevance and extracting facts
+4. if a relevant candidate only has `paper/paper.pdf`, try `pdf-to-md` first and fall back to direct PDF reading only if conversion is unavailable or fails
+5. extract title, authors, year, venue, problem, method, relevance, and available assets
+6. use local hits to guide and de-duplicate later external search
 
 ### Step 1: Search External Primary Sources
 

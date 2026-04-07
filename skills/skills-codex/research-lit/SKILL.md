@@ -9,16 +9,16 @@ Research topic: $ARGUMENTS
 
 ## Constants
 
-- **PAPER_LIBRARY** — Local directory containing user's paper collection (PDFs). Check these paths in order:
+- **PAPER_LIBRARY** — Local directory containing the user's paper packages. Check these paths in order:
   1. `papers/` in the current project directory
   2. Custom path specified by user in `AGENTS.md` under `## Paper Library`
-- **MAX_LOCAL_PAPERS = 20** — Maximum number of local PDFs to scan (read first 3 pages each). If more are found, prioritize by filename relevance to the topic.
+- **MAX_LOCAL_PAPERS = 20** — Maximum number of local paper packages to scan. Prefer `metadata.yaml` and `paper/paper.md`; only read raw PDFs when Markdown is unavailable.
 - **ARXIV_DOWNLOAD = false** — When `true`, download top 3-5 most relevant arXiv PDFs to PAPER_LIBRARY after search. When `false` (default), only fetch metadata (title, abstract, authors) via arXiv API — no files are downloaded.
 - **ARXIV_MAX_DOWNLOAD = 5** — Maximum number of PDFs to download when `ARXIV_DOWNLOAD = true`.
 
 > 💡 Overrides:
 > - `/research-lit "topic" — paper library: ~/my_papers/` — custom local PDF path
-> - `/research-lit "topic" — sources: zotero, local` — only search Zotero + local PDFs
+> - `/research-lit "topic" — sources: zotero, local` — only search Zotero + local paper packages
 > - `/research-lit "topic" — sources: zotero` — only search Zotero
 > - `/research-lit "topic" — sources: web` — only search the web (skip all local)
 > - `/research-lit "topic" — arxiv download: true` — download top relevant arXiv PDFs
@@ -40,7 +40,7 @@ Examples:
 /research-lit "diffusion models" — sources: all         → all
 /research-lit "diffusion models" — sources: zotero      → Zotero only
 /research-lit "diffusion models" — sources: zotero, web → Zotero + web
-/research-lit "diffusion models" — sources: local       → local PDFs only
+/research-lit "diffusion models" — sources: local       → local paper packages only
 /research-lit "topic" — sources: obsidian, local, web   → skip Zotero
 ```
 
@@ -50,10 +50,10 @@ Examples:
 |----------|--------|----|---------------|-----------------|
 | 1 | **Zotero** (via MCP) | `zotero` | Try calling any `mcp__zotero__*` tool — if unavailable, skip | Collections, tags, annotations, PDF highlights, BibTeX, semantic search |
 | 2 | **Obsidian** (via MCP) | `obsidian` | Try calling any `mcp__obsidian-vault__*` tool — if unavailable, skip | Research notes, paper summaries, tagged references, wikilinks |
-| 3 | **Local PDFs** | `local` | `Glob: papers/**/*.pdf` | Raw PDF content (first 3 pages) |
+| 3 | **Local paper packages** | `local` | `metadata.yaml`, `paper/paper.md`, `paper/paper.pdf` under PAPER_LIBRARY | Structured metadata, Markdown, PDFs, optional LaTeX/code assets |
 | 4 | **Web search** | `web` | Always available (WebSearch) | arXiv, Semantic Scholar, Google Scholar |
 
-> **Graceful degradation**: If no MCP servers are configured, the skill works exactly as before (local PDFs + web search). Zotero and Obsidian are pure additions.
+> **Graceful degradation**: If no MCP servers are configured, the skill still works with local paper packages + web search. Zotero and Obsidian are pure additions.
 
 ## Workflow
 
@@ -93,25 +93,50 @@ Try calling an Obsidian MCP tool (e.g., search). If it succeeds:
 
 > 📝 Obsidian notes represent the user's **processed understanding** — more valuable than raw paper content for understanding their perspective.
 
-### Step 0c: Scan Local Paper Library
+### Step 0c: Scan Local Paper Packages
 
 Before searching online, check if the user already has relevant papers locally:
 
-1. **Locate library**: Check PAPER_LIBRARY paths for PDF files
+1. **Locate packages**: Treat `PAPER_LIBRARY` as a package library, not a bare PDF dump. Prefer this order:
+   - `papers/**/metadata.yaml`
+   - `papers/**/paper/paper.md`
+   - `papers/**/paper/paper.pdf`
+   - fallback legacy files: `papers/**/*.pdf`
+
+   Prefer the helper scanner when available:
    ```
-   Glob: papers/**/*.pdf
+   SCRIPT=$(find skills/skills-codex/research-lit/scripts ~/.codex/skills/research-lit/scripts ~/.agents/skills/research-lit/scripts -name "scan_local_paper_packages.py" 2>/dev/null | head -1)
+   [ -n "$SCRIPT" ] && python3 "$SCRIPT" --root papers --query "QUERY" --limit 20 --ensure-markdown
    ```
+   If the script is unavailable, emulate the same priority manually.
 
-2. **De-duplicate against Zotero**: If Step 0a found papers, skip any local PDFs already covered by Zotero results (match by filename or title).
+2. **De-duplicate against Zotero**: If Step 0a found papers, skip local packages already covered by Zotero. Match by DOI first, then arXiv ID, then normalized title, and only then by filename/path.
 
-3. **Filter by relevance**: Match filenames and first-page content against the research topic. Skip clearly unrelated papers.
+3. **Read local assets in the right order**:
+   - Use `metadata.yaml` first for `title`, `authors`, `year`, `venue`, `doi`, `arxiv`, and `abstract`
+   - Use `paper/paper.md` as the primary text source for relevance filtering and summarization
+   - If a relevant candidate has `paper/paper.pdf` but no `paper/paper.md`, try `pdf-to-md` first to generate Markdown
+   - Only read the raw PDF directly when Markdown conversion is unavailable or fails
 
-4. **Summarize relevant papers**: For each relevant local PDF (up to MAX_LOCAL_PAPERS):
-   - Read first 3 pages (title, abstract, intro)
-   - Extract: title, authors, year, core contribution, relevance to topic
+4. **Filter by relevance**: Match the research topic against package-level signals first:
+   - `foldername`, package path, and filename
+   - `title` and `abstract` from `metadata.yaml`
+   - opening sections from `paper/paper.md`
+   Skip clearly unrelated papers before doing any expensive PDF work.
+
+5. **Use `pdf-to-md` lazily, not for the whole library**:
+   - Only attempt Markdown conversion for top local candidates that are actually relevant
+   - Do not bulk-convert every PDF in `papers/`
+   - If `MINERU_API_TOKEN` is missing or conversion fails, fall back to reading the PDF directly
+
+6. **Summarize relevant packages**: For each relevant local paper package (up to MAX_LOCAL_PAPERS):
+   - Prefer `metadata.yaml` + `paper/paper.md`
+   - Read raw PDF pages only as a fallback
+   - Extract: title, authors, year, venue, core contribution, relevance to topic
+   - Note which assets are available: `metadata`, `markdown`, `pdf`, `latex`, `repo`
    - Flag papers that are directly related vs tangentially related
 
-5. **Build local knowledge base**: Compile summaries into a "papers you already have" section. This becomes the starting point — external search fills the gaps.
+7. **Build local knowledge base**: Compile summaries into a "papers you already have" section. This becomes the starting point — external search fills the gaps.
 
 > 📚 If no local papers are found, skip to Step 1. If the user has a comprehensive local collection, the external search can be more targeted (focus on what's missing).
 

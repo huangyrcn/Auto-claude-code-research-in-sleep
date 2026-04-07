@@ -188,7 +188,7 @@ Summarize what was done:
 Suggest follow-up skills:
 
 ```text
-/research-lit "topic"     - multi-source review: Zotero + Obsidian + local PDFs + web
+/research-lit "topic"     - multi-source review: Zotero + Obsidian + local paper packages + web
 /novelty-check "idea"     - verify your idea is novel against these papers
 ```
 

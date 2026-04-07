@@ -117,7 +117,7 @@ If later reviewer feedback would change the problem being solved, mark that as *
 
 #### Step 1.1: Scan Grounding Material
 
-Check `papers/` first. Read only the relevant parts needed to answer:
+Check `papers/` first. Treat local papers as packages: use `metadata.yaml` for identifiers and abstracts, read `paper/paper.md` when present, and if a relevant candidate only has `paper/paper.pdf`, try `pdf-to-md` before reading the raw PDF. Read only the relevant parts needed to answer:
 
 - What mechanism do current methods use?
 - Where exactly do they fail for this problem?
